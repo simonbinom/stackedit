@@ -37,35 +37,35 @@
           </div>
         </div>
       </div>
-      <menu-entry @click.native="addBloggerAccount">
+      <menu-entry @click="addBloggerAccount">
         <icon-provider slot="icon" provider-id="blogger"></icon-provider>
         <span>Add Blogger account</span>
       </menu-entry>
-      <menu-entry @click.native="addDropboxAccount">
+      <menu-entry @click="addDropboxAccount">
         <icon-provider slot="icon" provider-id="dropbox"></icon-provider>
         <span>Add Dropbox account</span>
       </menu-entry>
-      <menu-entry @click.native="addGithubAccount">
+      <menu-entry @click="addGithubAccount">
         <icon-provider slot="icon" provider-id="github"></icon-provider>
         <span>Add GitHub account</span>
       </menu-entry>
-      <menu-entry @click.native="addGitlabAccount">
+      <menu-entry @click="addGitlabAccount">
         <icon-provider slot="icon" provider-id="gitlab"></icon-provider>
         <span>Add GitLab account</span>
       </menu-entry>
-      <menu-entry @click.native="addGoogleDriveAccount">
+      <menu-entry @click="addGoogleDriveAccount">
         <icon-provider slot="icon" provider-id="googleDrive"></icon-provider>
         <span>Add Google Drive account</span>
       </menu-entry>
-      <menu-entry @click.native="addGooglePhotosAccount">
+      <menu-entry @click="addGooglePhotosAccount">
         <icon-provider slot="icon" provider-id="googlePhotos"></icon-provider>
         <span>Add Google Photos account</span>
       </menu-entry>
-      <menu-entry @click.native="addWordpressAccount">
+      <menu-entry @click="addWordpressAccount">
         <icon-provider slot="icon" provider-id="wordpress"></icon-provider>
         <span>Add WordPress account</span>
       </menu-entry>
-      <menu-entry @click.native="addZendeskAccount">
+      <menu-entry @click="addZendeskAccount">
         <icon-provider slot="icon" provider-id="zendesk"></icon-provider>
         <span>Add Zendesk account</span>
       </menu-entry>

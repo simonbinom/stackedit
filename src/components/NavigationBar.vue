@@ -84,7 +84,9 @@ export default {
     mounted: false,
     title: '',
     titleFocus: false,
+    titleFakeElt: null,
     titleHover: false,
+    titleInputElt: null,
   }),
   computed: {
     ...mapState([

@@ -3,7 +3,7 @@ import ExplorerNode from '../../../../src/components/ExplorerNode';
 import store from '../../../../src/store';
 import workspaceSvc from '../../../../src/services/workspaceSvc';
 import explorerSvc from '../../../../src/services/explorerSvc';
-import specUtils from '../specUtils';
+import specUtils, { mountOptions } from '../specUtils';
 
 const makeFileNode = async () => {
   const file = await workspaceSvc.createFile({}, true);
@@ -20,28 +20,29 @@ const makeFolderNode = async () => {
 };
 
 const mount = node => shallowMount(ExplorerNode, {
-  store,
-  propsData: { node, depth: 1 },
+  ...mountOptions(),
+  props: { node, depth: 1 },
 });
-const mountAndSelect = (node) => {
+const mountAndSelect = async (node) => {
   const wrapper = mount(node);
-  wrapper.find('.explorer-node__item').trigger('click');
+  await wrapper.find('.explorer-node__item').trigger('click');
   expect(store.getters['explorer/selectedNode'].item.id).toEqual(node.item.id);
   expect(wrapper.classes()).toContain('explorer-node--selected');
   return wrapper;
 };
 
-const dragAndDrop = (sourceItem, targetItem) => {
+const dragAndDrop = async (sourceItem, targetItem) => {
   const sourceNode = store.getters['explorer/nodeMap'][sourceItem.id];
-  mountAndSelect(sourceNode).find('.explorer-node__item').trigger('dragstart', {
+  const sourceWrapper = await mountAndSelect(sourceNode);
+  await sourceWrapper.find('.explorer-node__item').trigger('dragstart', {
     dataTransfer: { setData: () => {} },
   });
   expect(store.state.explorer.dragSourceId).toEqual(sourceItem.id);
   const targetNode = store.getters['explorer/nodeMap'][targetItem.id];
   const wrapper = mount(targetNode);
-  wrapper.trigger('dragenter');
+  await wrapper.trigger('dragenter');
   expect(store.state.explorer.dragTargetId).toEqual(targetItem.id);
-  wrapper.trigger('drop');
+  await wrapper.trigger('drop');
   const expectedParentId = targetItem.type === 'file' ? targetItem.parentId : targetItem.id;
   expect(store.getters['explorer/selectedNode'].item.parentId).toEqual(expectedParentId);
 };
@@ -51,7 +52,7 @@ describe('ExplorerNode.vue', () => {
 
   it('should open file on select after a timeout', async () => {
     const node = await makeFileNode();
-    mountAndSelect(node);
+    await mountAndSelect(node);
     expect(store.getters['file/current'].id).not.toEqual(node.item.id);
     await new Promise(resolve => setTimeout(resolve, 10));
     expect(store.getters['file/current'].id).toEqual(node.item.id);
@@ -61,7 +62,7 @@ describe('ExplorerNode.vue', () => {
   it('should not open already open file', async () => {
     const node = await makeFileNode();
     store.commit('file/setCurrentId', node.item.id);
-    mountAndSelect(node);
+    await mountAndSelect(node);
     await new Promise(resolve => setTimeout(resolve, 10));
     expect(store.getters['file/current'].id).toEqual(node.item.id);
     await specUtils.expectBadge('switchFile', false);
@@ -69,7 +70,7 @@ describe('ExplorerNode.vue', () => {
 
   it('should open folder on select after a timeout', async () => {
     const node = await makeFolderNode();
-    const wrapper = mountAndSelect(node);
+    const wrapper = await mountAndSelect(node);
     expect(wrapper.classes()).not.toContain('explorer-node--open');
     await new Promise(resolve => setTimeout(resolve, 10));
     expect(wrapper.classes()).toContain('explorer-node--open');
@@ -77,12 +78,13 @@ describe('ExplorerNode.vue', () => {
 
   it('should open folder on new child', async () => {
     const node = await makeFolderNode();
-    const wrapper = mountAndSelect(node);
+    const wrapper = await mountAndSelect(node);
     // Close the folder
-    wrapper.find('.explorer-node__item').trigger('click');
+    await wrapper.find('.explorer-node__item').trigger('click');
     await new Promise(resolve => setTimeout(resolve, 10));
     expect(wrapper.classes()).not.toContain('explorer-node--open');
     explorerSvc.newItem();
+    await wrapper.vm.$nextTick();
     expect(wrapper.classes()).toContain('explorer-node--open');
   });
 
@@ -91,7 +93,7 @@ describe('ExplorerNode.vue', () => {
     const wrapper = mount(node);
     wrapper.trigger('contextmenu');
     await specUtils.resolveContextMenu('New file');
-    expect(wrapper.contains('.explorer-node__new-child')).toBe(true);
+    expect(wrapper.find('.explorer-node__new-child').exists()).toBe(true);
     store.commit('explorer/setNewItemName', modifiedName);
     wrapper.find('.explorer-node__new-child .text-input').trigger('blur');
     await new Promise(resolve => setTimeout(resolve, 1));
@@ -100,7 +102,7 @@ describe('ExplorerNode.vue', () => {
       type: 'file',
       parentId: node.item.id,
     });
-    expect(wrapper.contains('.explorer-node__new-child')).toBe(false);
+    expect(wrapper.find('.explorer-node__new-child').exists()).toBe(false);
     await specUtils.expectBadge('createFile');
   });
 
@@ -109,9 +111,10 @@ describe('ExplorerNode.vue', () => {
     const wrapper = mount(node);
     wrapper.trigger('contextmenu');
     await specUtils.resolveContextMenu('New file');
-    expect(wrapper.contains('.explorer-node__new-child')).toBe(true);
+    expect(wrapper.find('.explorer-node__new-child').exists()).toBe(true);
     store.commit('explorer/setNewItemName', modifiedName);
-    wrapper.find('.explorer-node__new-child .text-input').trigger('keydown', {
+    await wrapper.find('.explorer-node__new-child .text-input').trigger('keydown', {
+      key: 'Escape',
       keyCode: 27,
     });
     await new Promise(resolve => setTimeout(resolve, 1));
@@ -120,7 +123,7 @@ describe('ExplorerNode.vue', () => {
       type: 'file',
       parentId: node.item.id,
     });
-    expect(wrapper.contains('.explorer-node__new-child')).toBe(false);
+    expect(wrapper.find('.explorer-node__new-child').exists()).toBe(false);
     await specUtils.expectBadge('createFile', false);
   });
 
@@ -141,7 +144,7 @@ describe('ExplorerNode.vue', () => {
     const wrapper = mount(node);
     wrapper.trigger('contextmenu');
     await specUtils.resolveContextMenu('New folder');
-    expect(wrapper.contains('.explorer-node__new-child--folder')).toBe(true);
+    expect(wrapper.find('.explorer-node__new-child--folder').exists()).toBe(true);
     store.commit('explorer/setNewItemName', modifiedName);
     wrapper.find('.explorer-node__new-child--folder .text-input').trigger('blur');
     await new Promise(resolve => setTimeout(resolve, 1));
@@ -150,7 +153,7 @@ describe('ExplorerNode.vue', () => {
       type: 'folder',
       parentId: node.item.id,
     });
-    expect(wrapper.contains('.explorer-node__new-child--folder')).toBe(false);
+    expect(wrapper.find('.explorer-node__new-child--folder').exists()).toBe(false);
     await specUtils.expectBadge('createFolder');
   });
 
@@ -159,9 +162,10 @@ describe('ExplorerNode.vue', () => {
     const wrapper = mount(node);
     wrapper.trigger('contextmenu');
     await specUtils.resolveContextMenu('New folder');
-    expect(wrapper.contains('.explorer-node__new-child--folder')).toBe(true);
+    expect(wrapper.find('.explorer-node__new-child--folder').exists()).toBe(true);
     store.commit('explorer/setNewItemName', modifiedName);
-    wrapper.find('.explorer-node__new-child--folder .text-input').trigger('keydown', {
+    await wrapper.find('.explorer-node__new-child--folder .text-input').trigger('keydown', {
+      key: 'Escape',
       keyCode: 27,
     });
     await new Promise(resolve => setTimeout(resolve, 1));
@@ -170,7 +174,7 @@ describe('ExplorerNode.vue', () => {
       type: 'folder',
       parentId: node.item.id,
     });
-    expect(wrapper.contains('.explorer-node__new-child--folder')).toBe(false);
+    expect(wrapper.find('.explorer-node__new-child--folder').exists()).toBe(false);
     await specUtils.expectBadge('createFolder', false);
   });
 
@@ -197,7 +201,7 @@ describe('ExplorerNode.vue', () => {
     const wrapper = mount(node);
     wrapper.trigger('contextmenu');
     await specUtils.resolveContextMenu('Rename');
-    expect(wrapper.contains('.explorer-node__item-editor')).toBe(true);
+    expect(wrapper.find('.explorer-node__item-editor').exists()).toBe(true);
     wrapper.setData({ editingValue: modifiedName });
     wrapper.find('.explorer-node__item-editor .text-input').trigger('blur');
     expect(store.getters['explorer/selectedNode'].item.name).toEqual(modifiedName);
@@ -209,9 +213,10 @@ describe('ExplorerNode.vue', () => {
     const wrapper = mount(node);
     wrapper.trigger('contextmenu');
     await specUtils.resolveContextMenu('Rename');
-    expect(wrapper.contains('.explorer-node__item-editor')).toBe(true);
+    expect(wrapper.find('.explorer-node__item-editor').exists()).toBe(true);
     wrapper.setData({ editingValue: modifiedName });
-    wrapper.find('.explorer-node__item-editor .text-input').trigger('keydown', {
+    await wrapper.find('.explorer-node__item-editor .text-input').trigger('keydown', {
+      key: 'Escape',
       keyCode: 27,
     });
     expect(store.getters['explorer/selectedNode'].item.name).not.toEqual(modifiedName);
@@ -223,7 +228,7 @@ describe('ExplorerNode.vue', () => {
     const wrapper = mount(node);
     wrapper.trigger('contextmenu');
     await specUtils.resolveContextMenu('Rename');
-    expect(wrapper.contains('.explorer-node__item-editor')).toBe(true);
+    expect(wrapper.find('.explorer-node__item-editor').exists()).toBe(true);
     wrapper.setData({ editingValue: modifiedName });
     wrapper.find('.explorer-node__item-editor .text-input').trigger('blur');
     expect(store.getters['explorer/selectedNode'].item.name).toEqual(modifiedName);
@@ -235,9 +240,10 @@ describe('ExplorerNode.vue', () => {
     const wrapper = mount(node);
     wrapper.trigger('contextmenu');
     await specUtils.resolveContextMenu('Rename');
-    expect(wrapper.contains('.explorer-node__item-editor')).toBe(true);
+    expect(wrapper.find('.explorer-node__item-editor').exists()).toBe(true);
     wrapper.setData({ editingValue: modifiedName });
-    wrapper.find('.explorer-node__item-editor .text-input').trigger('keydown', {
+    await wrapper.find('.explorer-node__item-editor .text-input').trigger('keydown', {
+      key: 'Escape',
       keyCode: 27,
     });
     expect(store.getters['explorer/selectedNode'].item.name).not.toEqual(modifiedName);
@@ -259,14 +265,14 @@ describe('ExplorerNode.vue', () => {
   it('should move file into a folder', async () => {
     const sourceItem = await workspaceSvc.createFile({}, true);
     const targetItem = await workspaceSvc.storeItem({ type: 'folder' });
-    dragAndDrop(sourceItem, targetItem);
+    await dragAndDrop(sourceItem, targetItem);
     await specUtils.expectBadge('moveFile');
   });
 
   it('should move folder into a folder', async () => {
     const sourceItem = await workspaceSvc.storeItem({ type: 'folder' });
     const targetItem = await workspaceSvc.storeItem({ type: 'folder' });
-    dragAndDrop(sourceItem, targetItem);
+    await dragAndDrop(sourceItem, targetItem);
     await specUtils.expectBadge('moveFolder');
   });
 
@@ -274,19 +280,21 @@ describe('ExplorerNode.vue', () => {
     const targetItem = await workspaceSvc.storeItem({ type: 'folder' });
     const file = await workspaceSvc.createFile({ parentId: targetItem.id }, true);
     const sourceItem = await workspaceSvc.createFile({}, true);
-    dragAndDrop(sourceItem, file);
+    await dragAndDrop(sourceItem, file);
     await specUtils.expectBadge('moveFile');
   });
 
   it('should not move the trash folder', async () => {
     const sourceNode = store.getters['explorer/nodeMap'].trash;
-    mountAndSelect(sourceNode).find('.explorer-node__item').trigger('dragstart');
+    const wrapper = await mountAndSelect(sourceNode);
+    await wrapper.find('.explorer-node__item').trigger('dragstart');
     expect(store.state.explorer.dragSourceId).not.toEqual('trash');
   });
 
   it('should not move the temp folder', async () => {
     const sourceNode = store.getters['explorer/nodeMap'].temp;
-    mountAndSelect(sourceNode).find('.explorer-node__item').trigger('dragstart');
+    const wrapper = await mountAndSelect(sourceNode);
+    await wrapper.find('.explorer-node__item').trigger('dragstart');
     expect(store.state.explorer.dragSourceId).not.toEqual('temp');
   });
 

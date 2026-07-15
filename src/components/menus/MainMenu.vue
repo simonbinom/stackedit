@@ -34,86 +34,86 @@
         <span><b>{{currentWorkspace.name}}</b> not synced.</span>
       </div>
     </div>
-    <menu-entry v-if="!loginToken" @click.native="signin">
+    <menu-entry v-if="!loginToken" @click="signin">
       <icon-login slot="icon"></icon-login>
       <div>Sign in with Google</div>
       <span>Sync your main workspace and unlock functionalities.</span>
     </menu-entry>
-    <menu-entry @click.native="setPanel('workspaces')">
+    <menu-entry @click="setPanel('workspaces')">
       <icon-database slot="icon"></icon-database>
       <div><div class="menu-entry__label menu-entry__label--count" v-if="workspaceCount">{{workspaceCount}}</div> Workspaces</div>
       <span>Switch to another workspace.</span>
     </menu-entry>
     <hr>
-    <menu-entry @click.native="setPanel('sync')">
+    <menu-entry @click="setPanel('sync')">
       <icon-sync slot="icon"></icon-sync>
       <div><div class="menu-entry__label menu-entry__label--count" v-if="syncLocationCount">{{syncLocationCount}}</div> Synchronize</div>
       <span>Sync your files in the Cloud.</span>
     </menu-entry>
-    <menu-entry @click.native="setPanel('publish')">
+    <menu-entry @click="setPanel('publish')">
       <icon-upload slot="icon"></icon-upload>
       <div><div class="menu-entry__label menu-entry__label--count" v-if="publishLocationCount">{{publishLocationCount}}</div>Publish</div>
       <span>Export your files to the web.</span>
     </menu-entry>
-    <menu-entry @click.native="setPanel('history')">
+    <menu-entry @click="setPanel('history')">
       <icon-history slot="icon"></icon-history>
       <div>History</div>
       <span>Track and restore file revisions.</span>
     </menu-entry>
-    <menu-entry @click.native="fileProperties">
+    <menu-entry @click="fileProperties">
       <icon-view-list slot="icon"></icon-view-list>
       <div>File properties</div>
       <span>Add metadata and configure extensions.</span>
     </menu-entry>
     <hr>
-    <menu-entry @click.native="setPanel('toc')">
+    <menu-entry @click="setPanel('toc')">
       <icon-toc slot="icon"></icon-toc>
       Table of contents
     </menu-entry>
-    <menu-entry @click.native="setPanel('help')">
+    <menu-entry @click="setPanel('help')">
       <icon-help-circle slot="icon"></icon-help-circle>
       Markdown cheat sheet
     </menu-entry>
     <hr>
-    <menu-entry @click.native="setPanel('importExport')">
+    <menu-entry @click="setPanel('importExport')">
       <icon-content-save slot="icon"></icon-content-save>
       Import/export
     </menu-entry>
-    <menu-entry @click.native="print">
+    <menu-entry @click="print">
       <icon-printer slot="icon"></icon-printer>
       Print
     </menu-entry>
     <hr>
-    <menu-entry @click.native="badges">
+    <menu-entry @click="badges">
       <icon-seal slot="icon"></icon-seal>
       <div><div class="menu-entry__label menu-entry__label--count">{{badgeCount}}/{{featureCount}}</div> Badges</div>
       <span>List application features and earned badges.</span>
     </menu-entry>
-    <menu-entry @click.native="accounts">
+    <menu-entry @click="accounts">
       <icon-key slot="icon"></icon-key>
       <div><div class="menu-entry__label menu-entry__label--count">{{accountCount}}</div> Accounts</div>
       <span>Manage access to your external accounts.</span>
     </menu-entry>
-    <menu-entry @click.native="templates">
+    <menu-entry @click="templates">
       <icon-code-braces slot="icon"></icon-code-braces>
       <div><div class="menu-entry__label menu-entry__label--count">{{templateCount}}</div> Templates</div>
       <span>Configure Handlebars templates for your exports.</span>
     </menu-entry>
-    <menu-entry @click.native="settings">
+    <menu-entry @click="settings">
       <icon-settings slot="icon"></icon-settings>
       <div>Settings</div>
       <span>Tweak application and keyboard shortcuts.</span>
     </menu-entry>
     <hr>
-    <menu-entry @click.native="setPanel('workspaceBackups')">
+    <menu-entry @click="setPanel('workspaceBackups')">
       <icon-content-save slot="icon"></icon-content-save>
       Workspace backups
     </menu-entry>
-    <menu-entry @click.native="reset">
+    <menu-entry @click="reset">
       <icon-logout slot="icon"></icon-logout>
       Reset application
     </menu-entry>
-    <menu-entry @click.native="about">
+    <menu-entry @click="about">
       <icon-help-circle slot="icon"></icon-help-circle>
       About StackEdit
     </menu-entry>

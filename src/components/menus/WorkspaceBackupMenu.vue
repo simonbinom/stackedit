@@ -9,7 +9,7 @@
         Import workspace backup
       </div>
     </label>
-    <menu-entry @click.native="exportWorkspace">
+    <menu-entry @click="exportWorkspace">
       <icon-content-save slot="icon"></icon-content-save>
       Export workspace backup
     </menu-entry>

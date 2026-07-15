@@ -2,6 +2,7 @@ import providerRegistry from '../services/providers/common/providerRegistry';
 import utils from '../services/utils';
 
 const defaultTimeout = 5000; // 5 sec
+let nextId = 0;
 
 export default {
   namespaced: true,
@@ -23,11 +24,14 @@ export default {
         return existingItem.promise;
       }
 
+      const notificationId = nextId;
+      nextId += 1;
+      item.notificationId = notificationId;
       item.promise = new Promise((resolve, reject) => {
         commit('setItems', [...state.items, item]);
         const removeItem = () => commit(
           'setItems',
-          state.items.filter(otherItem => otherItem !== item),
+          state.items.filter(otherItem => otherItem.notificationId !== notificationId),
         );
         setTimeout(
           () => removeItem(),

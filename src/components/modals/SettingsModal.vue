@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import yaml from 'js-yaml';
+import { load as loadYaml } from 'js-yaml/browser';
 import { mapGetters } from 'vuex';
 import ModalInner from './common/ModalInner';
 import Tab from './common/Tab';
@@ -72,7 +72,9 @@ export default {
     setCustomSettings(value) {
       this.customSettings = value;
       try {
-        yaml.safeLoad(this.strippedCustomSettings);
+        if (this.strippedCustomSettings.trim()) {
+          loadYaml(this.strippedCustomSettings);
+        }
         this.error = null;
       } catch (e) {
         this.error = e.message;
@@ -82,7 +84,7 @@ export default {
       if (!this.error) {
         const settings = this.strippedCustomSettings;
         await store.dispatch('data/setSettings', settings);
-        const customSettings = yaml.safeLoad(settings);
+        const customSettings = settings.trim() ? loadYaml(settings) : {};
         if (customSettings.shortcuts) {
           badgeSvc.addBadge('changeShortcuts');
         }

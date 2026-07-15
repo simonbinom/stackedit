@@ -1,5 +1,4 @@
-import Vue from 'vue';
-import yaml from 'js-yaml';
+import { load as loadYaml } from 'js-yaml/browser';
 import utils from '../services/utils';
 import defaultWorkspaces from '../data/defaults/defaultWorkspaces';
 import defaultSettings from '../data/defaults/defaultSettings.yml';
@@ -133,11 +132,12 @@ export default {
       });
 
       // Store item in itemsById or lsItemsById if its stored in the localStorage
-      Vue.set(localStorageIdSet.has(item.id) ? lsItemsById : itemsById, item.id, item);
+      const target = localStorageIdSet.has(item.id) ? lsItemsById : itemsById;
+      target[item.id] = item;
     },
     deleteItem({ itemsById }, id) {
       // Only used by localDbSvc to clean itemsById from object moved to localStorage
-      Vue.delete(itemsById, id);
+      delete itemsById[id];
     },
   },
   getters: {
@@ -145,8 +145,8 @@ export default {
     workspaces: getter('workspaces'), // Not to be used, prefer workspace/workspacesById
     settings: getter('settings'),
     computedSettings: (state, { settings }) => {
-      const customSettings = yaml.safeLoad(settings);
-      const parsedSettings = yaml.safeLoad(defaultSettings);
+      const customSettings = settings.trim() ? loadYaml(settings) : {};
+      const parsedSettings = loadYaml(defaultSettings);
       const override = (obj, opt) => {
         const objType = Object.prototype.toString.call(obj);
         const optType = Object.prototype.toString.call(opt);

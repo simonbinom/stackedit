@@ -1,32 +1,45 @@
-import Vue from 'vue';
-import 'babel-polyfill';
-import 'indexeddbshim/dist/indexeddbshim';
-import * as OfflinePluginRuntime from 'offline-plugin/runtime';
+import { configureCompat, createApp } from 'vue';
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
+import { Workbox } from 'workbox-window';
 import './extensions';
 import './services/optional';
-import './icons';
+import installIcons from './icons';
+import installVueGlobals from './components/common/vueGlobals';
 import App from './components/App';
 import store from './store';
 import localDbSvc from './services/localDbSvc';
 
-if (!indexedDB) {
+if (!window.indexedDB) {
   throw new Error('Your browser is not supported. Please upgrade to the latest version.');
 }
 
-OfflinePluginRuntime.install({
-  onUpdateReady: () => {
-    // Tells to new SW to take control immediately
-    OfflinePluginRuntime.applyUpdate();
-  },
-  onUpdated: async () => {
+configureCompat({
+  ATTR_ENUMERATED_COERCION: 'suppress-warning',
+  RENDER_FUNCTION: false,
+});
+
+if (NODE_ENV === 'production' && 'serviceWorker' in navigator) {
+  const workbox = new Workbox('/sw.js');
+  let pendingUpdate = false;
+
+  workbox.addEventListener('waiting', () => {
+    pendingUpdate = true;
+    workbox.messageSkipWaiting();
+  });
+  workbox.addEventListener('controlling', async () => {
+    if (!pendingUpdate) {
+      return;
+    }
     if (!store.state.light) {
       await localDbSvc.sync();
       localStorage.updated = true;
       // Reload the webpage to load into the new version
       window.location.reload();
     }
-  },
-});
+  });
+  workbox.register();
+}
 
 if (localStorage.updated) {
   store.dispatch('notification/info', 'StackEdit has just updated itself!');
@@ -49,11 +62,8 @@ if (!localStorage.installPrompted) {
   });
 }
 
-Vue.config.productionTip = false;
-
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  store,
-  render: h => h(App),
-});
+createApp(App)
+  .use(store)
+  .use(installIcons)
+  .use(installVueGlobals)
+  .mount('#app');

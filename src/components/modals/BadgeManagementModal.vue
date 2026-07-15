@@ -33,7 +33,6 @@
 </template>
 
 <script>
-import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import ModalInner from './common/ModalInner';
 import store from '../../store';
@@ -61,7 +60,7 @@ export default {
   },
   methods: {
     show(featureId) {
-      Vue.set(this.shown, featureId, true);
+      this.shown[featureId] = true;
     },
   },
 };

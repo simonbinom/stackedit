@@ -32,7 +32,7 @@
           </div>
           <div class="revision__header flex flex--column">
             <user-name :user-id="revision.sub"></user-name>
-            <div class="revision__created">{{revision.created | formatTime}}</div>
+            <div class="revision__created">{{$formatTime(revision.created)}}</div>
           </div>
         </a>
       </div>

@@ -1,29 +1,24 @@
-const qs = require('qs'); // eslint-disable-line import/no-extraneous-dependencies
-const request = require('request');
 const conf = require('./conf');
 
-function githubToken(clientId, code) {
-  return new Promise((resolve, reject) => {
-    request({
-      method: 'POST',
-      url: 'https://github.com/login/oauth/access_token',
-      qs: {
-        client_id: clientId,
-        client_secret: conf.values.githubClientSecret,
-        code,
-      },
-    }, (err, res, body) => {
-      if (err) {
-        reject(err);
-      }
-      const token = qs.parse(body).access_token;
-      if (token) {
-        resolve(token);
-      } else {
-        reject(res.statusCode);
-      }
-    });
+async function githubToken(clientId, code) {
+  const body = new URLSearchParams({
+    client_id: clientId,
+    client_secret: conf.values.githubClientSecret,
+    code,
   });
+  const response = await fetch('https://github.com/login/oauth/access_token', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/x-www-form-urlencoded',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body,
+  });
+  const token = new URLSearchParams(await response.text()).get('access_token');
+  if (!response.ok || !token) {
+    throw new Error(response.statusText || response.status);
+  }
+  return token;
 }
 
 exports.githubToken = (req, res) => {

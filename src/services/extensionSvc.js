@@ -30,8 +30,7 @@ export default {
   },
 
   sectionPreview(elt, options, isEditor) {
-    sectionPreviewListeners.forEach((listener) => {
-      listener(elt, options, isEditor);
-    });
+    return Promise.all(sectionPreviewListeners.map(listener =>
+      listener(elt, options, isEditor)));
   },
 };

@@ -84,7 +84,7 @@
 </template>
 
 <script>
-import yaml from 'js-yaml';
+import { dump as dumpYaml, load as loadYaml } from 'js-yaml/browser';
 import { mapGetters } from 'vuex';
 import ModalInner from './common/ModalInner';
 import Tab from './common/Tab';
@@ -187,7 +187,7 @@ export default {
           delete properties.extensions;
         }
         this.setYamlProperties(Object.keys(properties).length
-          ? yaml.safeDump(properties)
+          ? dumpYaml(properties)
           : '\n');
       }
     },
@@ -202,7 +202,7 @@ export default {
     setYamlProperties(value) {
       this.yamlProperties = value;
       try {
-        this.properties = yaml.safeLoad(value);
+        this.properties = value.trim() ? loadYaml(value) : {};
         this.error = null;
       } catch (e) {
         this.error = e.message;

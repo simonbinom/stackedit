@@ -6,12 +6,12 @@
     <div v-else>
       <div class="side-bar__info" v-if="syncLocations.length">
         <p>{{currentFileName}} is already synchronized.</p>
-        <menu-entry @click.native="requestSync">
+        <menu-entry @click="requestSync">
           <icon-sync slot="icon"></icon-sync>
           <div>Synchronize now</div>
           <span>Download / upload file changes.</span>
         </menu-entry>
-        <menu-entry @click.native="manageSync">
+        <menu-entry @click="manageSync">
           <icon-view-list slot="icon"></icon-view-list>
           <div><div class="menu-entry__label menu-entry__label--count">{{locationCount}}</div> File synchronization</div>
           <span>Manage synchronized locations for {{currentFileName}}.</span>
@@ -22,72 +22,72 @@
       </div>
       <hr>
       <div v-for="token in dropboxTokens" :key="token.sub">
-        <menu-entry @click.native="openDropbox(token)">
+        <menu-entry @click="openDropbox(token)">
           <icon-provider slot="icon" provider-id="dropbox"></icon-provider>
           <div>Open from Dropbox</div>
           <span>{{token.name}}</span>
         </menu-entry>
-        <menu-entry @click.native="saveDropbox(token)">
+        <menu-entry @click="saveDropbox(token)">
           <icon-provider slot="icon" provider-id="dropbox"></icon-provider>
           <div>Save on Dropbox</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in githubTokens" :key="token.sub">
-        <menu-entry @click.native="openGithub(token)">
+        <menu-entry @click="openGithub(token)">
           <icon-provider slot="icon" provider-id="github"></icon-provider>
           <div>Open from GitHub</div>
           <span>{{token.name}}</span>
         </menu-entry>
-        <menu-entry @click.native="saveGithub(token)">
+        <menu-entry @click="saveGithub(token)">
           <icon-provider slot="icon" provider-id="github"></icon-provider>
           <div>Save on GitHub</div>
           <span>{{token.name}}</span>
         </menu-entry>
-        <menu-entry @click.native="saveGist(token)">
+        <menu-entry @click="saveGist(token)">
           <icon-provider slot="icon" provider-id="gist"></icon-provider>
           <div>Save on Gist</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in gitlabTokens" :key="token.sub">
-        <menu-entry @click.native="openGitlab(token)">
+        <menu-entry @click="openGitlab(token)">
           <icon-provider slot="icon" provider-id="gitlab"></icon-provider>
           <div>Open from GitLab</div>
           <span>{{token.name}}</span>
         </menu-entry>
-        <menu-entry @click.native="saveGitlab(token)">
+        <menu-entry @click="saveGitlab(token)">
           <icon-provider slot="icon" provider-id="gitlab"></icon-provider>
           <div>Save on GitLab</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in googleDriveTokens" :key="token.sub">
-        <menu-entry @click.native="openGoogleDrive(token)">
+        <menu-entry @click="openGoogleDrive(token)">
           <icon-provider slot="icon" provider-id="googleDrive"></icon-provider>
           <div>Open from Google Drive</div>
           <span>{{token.name}}</span>
         </menu-entry>
-        <menu-entry @click.native="saveGoogleDrive(token)">
+        <menu-entry @click="saveGoogleDrive(token)">
           <icon-provider slot="icon" provider-id="googleDrive"></icon-provider>
           <div>Save on Google Drive</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <hr>
-      <menu-entry @click.native="addDropboxAccount">
+      <menu-entry @click="addDropboxAccount">
         <icon-provider slot="icon" provider-id="dropbox"></icon-provider>
         <span>Add Dropbox account</span>
       </menu-entry>
-      <menu-entry @click.native="addGithubAccount">
+      <menu-entry @click="addGithubAccount">
         <icon-provider slot="icon" provider-id="github"></icon-provider>
         <span>Add GitHub account</span>
       </menu-entry>
-      <menu-entry @click.native="addGitlabAccount">
+      <menu-entry @click="addGitlabAccount">
         <icon-provider slot="icon" provider-id="gitlab"></icon-provider>
         <span>Add GitLab account</span>
       </menu-entry>
-      <menu-entry @click.native="addGoogleDriveAccount">
+      <menu-entry @click="addGoogleDriveAccount">
         <icon-provider slot="icon" provider-id="googleDrive"></icon-provider>
         <span>Add Google Drive account</span>
       </menu-entry>

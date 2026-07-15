@@ -11,8 +11,9 @@ var opn = require('opn')
 var path = require('path')
 var express = require('express')
 var webpack = require('webpack')
-var proxyMiddleware = require('http-proxy-middleware')
+var createProxyMiddleware = require('http-proxy-middleware').createProxyMiddleware
 var webpackConfig = require('./webpack.dev.conf')
+var HtmlWebpackPlugin = require('html-webpack-plugin')
 
 // default port where dev server listens for incoming traffic
 var port = process.env.PORT || config.dev.port
@@ -30,15 +31,15 @@ require('../server')(app);
 
 var devMiddleware = require('webpack-dev-middleware')(compiler, {
   publicPath: webpackConfig.output.publicPath,
-  quiet: true
+  stats: 'none'
 })
 
 var hotMiddleware = require('webpack-hot-middleware')(compiler, {
   log: () => {}
 })
 // force page reload when html-webpack-plugin template changes
-compiler.plugin('compilation', function (compilation) {
-  compilation.plugin('html-webpack-plugin-after-emit', function (data, cb) {
+compiler.hooks.compilation.tap('dev-server', function (compilation) {
+  HtmlWebpackPlugin.getHooks(compilation).afterEmit.tapAsync('dev-server', function (data, cb) {
     hotMiddleware.publish({ action: 'reload' })
     cb()
   })
@@ -50,7 +51,7 @@ Object.keys(proxyTable).forEach(function (context) {
   if (typeof options === 'string') {
     options = { target: options }
   }
-  app.use(proxyMiddleware(options.filter || context, options))
+  app.use(createProxyMiddleware(options.filter || context, options))
 })
 
 // handle fallback for HTML5 history API

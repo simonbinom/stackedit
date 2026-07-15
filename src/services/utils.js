@@ -1,4 +1,4 @@
-import yaml from 'js-yaml';
+import { load as loadYaml } from 'js-yaml/browser';
 import '../libs/clunderscore';
 import presets from '../data/presets';
 import constants from '../data/constants';
@@ -195,7 +195,7 @@ export default {
   computeProperties(yamlProperties) {
     let properties = {};
     try {
-      properties = yaml.safeLoad(yamlProperties) || {};
+      properties = loadYaml(yamlProperties) || {};
     } catch (e) {
       // Ignore
     }
