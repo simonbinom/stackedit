@@ -322,7 +322,7 @@ export default {
     };
     window.addEventListener('keyup', this.onKeyup);
   },
-  destroyed() {
+  unmounted() {
     // Close revision
     this.setRevisionContent();
     // Remove highlighters
