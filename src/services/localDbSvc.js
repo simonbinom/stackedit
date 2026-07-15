@@ -236,10 +236,11 @@ const localDbSvc = {
     Object.entries(storeItemMap).forEach(([, storeItem]) => {
       // Store object has changed
       if (this.hashMap[storeItem.type][storeItem.id] !== storeItem.hash) {
-        const item = {
+        // Store items can be Vue reactive proxies; IndexedDB can only clone plain data.
+        const item = utils.deepCopy({
           ...storeItem,
           tx: incrementedTx,
-        };
+        });
         dbStore.put(item);
         this.hashMap[item.type][item.id] = item.hash;
         this.lastTx = incrementedTx;

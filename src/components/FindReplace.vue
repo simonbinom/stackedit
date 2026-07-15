@@ -270,7 +270,7 @@ export default {
       setTimeout(() => this.unselectClassApplier(), 15);
     window.addEventListener('focusin', this.onFocusIn);
   },
-  destroyed() {
+  unmounted() {
     // Unregister listeners
     editorSvc.clEditor.off('contentChanged', this.debouncedHighlightOccurrences);
     window.removeEventListener('keyup', this.onKeyup);
