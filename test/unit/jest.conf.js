@@ -2,22 +2,22 @@ const path = require('path');
 
 module.exports = {
   rootDir: path.resolve(__dirname, '../../'),
+  testEnvironment: 'jsdom',
   moduleFileExtensions: [
     'js',
     'json',
     'vue',
   ],
   moduleNameMapper: {
+    '^vue$': '@vue/compat',
     '\\.(css|scss)$': 'identity-obj-proxy',
-    '^!raw-loader!': 'identity-obj-proxy',
-    '^worker-loader!\\./templateWorker\\.js$': '<rootDir>/test/unit/mocks/templateWorkerMock',
+    '\\?raw$': '<rootDir>/test/unit/mocks/rawFileMock',
   },
   transform: {
     '^.+\\.js$': '<rootDir>/node_modules/babel-jest',
-    '.*\\.(vue)$': '<rootDir>/node_modules/vue-jest',
-    '.*\\.(yml|html|md)$': 'jest-raw-loader',
+    '.*\\.(vue)$': '<rootDir>/node_modules/@vue/vue3-jest',
+    '.*\\.(yml|html|md)$': '<rootDir>/test/unit/rawTransformer',
   },
-  snapshotSerializers: ['<rootDir>/node_modules/jest-serializer-vue'],
   setupFiles: [
     '<rootDir>/test/unit/setup',
   ],

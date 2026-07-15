@@ -22,8 +22,8 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex';
-import Prism from 'prismjs';
 import UserImage from '../UserImage';
+import Prism from '../../services/prismSvc';
 import cledit from '../../services/editor/cledit';
 import editorSvc from '../../services/editorSvc';
 import markdownConversionSvc from '../../services/markdownConversionSvc';

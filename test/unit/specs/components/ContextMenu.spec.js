@@ -1,9 +1,9 @@
 import { shallowMount } from '@vue/test-utils';
 import ContextMenu from '../../../../src/components/ContextMenu';
 import store from '../../../../src/store';
-import '../specUtils';
+import { mountOptions } from '../specUtils';
 
-const mount = () => shallowMount(ContextMenu, { store });
+const mount = () => shallowMount(ContextMenu, mountOptions());
 
 describe('ContextMenu.vue', () => {
   const name = 'Name';
@@ -17,7 +17,7 @@ describe('ContextMenu.vue', () => {
 
   it('should open/close itself', async () => {
     const wrapper = mount();
-    expect(wrapper.contains('.context-menu__item')).toEqual(false);
+    expect(wrapper.find('.context-menu__item').exists()).toEqual(false);
     setTimeout(() => wrapper.find('.context-menu__item').trigger('click'), 1);
     const item = await store.dispatch('contextMenu/open', makeOptions());
     expect(item.name).toEqual(name);

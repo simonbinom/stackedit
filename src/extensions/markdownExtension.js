@@ -1,4 +1,3 @@
-import Prism from 'prismjs';
 import markdownitAbbr from 'markdown-it-abbr';
 import markdownitDeflist from 'markdown-it-deflist';
 import markdownitFootnote from 'markdown-it-footnote';
@@ -9,6 +8,7 @@ import markdownitSup from 'markdown-it-sup';
 import markdownitTasklist from './libs/markdownItTasklist';
 import markdownitAnchor from './libs/markdownItAnchor';
 import extensionSvc from '../services/extensionSvc';
+import Prism from '../services/prismSvc';
 
 const coreBaseRules = [
   'normalize',

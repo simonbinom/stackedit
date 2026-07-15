@@ -1,0 +1,36 @@
+module.exports = {
+  extends: ['stylelint-config-standard-scss'],
+  overrides: [
+    {
+      files: ['**/*.vue'],
+      customSyntax: 'postcss-html',
+    },
+    {
+      files: ['**/*.scss'],
+      customSyntax: 'postcss-scss',
+    },
+  ],
+  rules: {
+    'alpha-value-notation': null,
+    'at-rule-empty-line-before': null,
+    'color-function-alias-notation': null,
+    'color-function-notation': null,
+    'declaration-property-value-keyword-no-deprecated': null,
+    'declaration-block-no-redundant-longhand-properties': null,
+    'font-family-name-quotes': null,
+    'function-url-quotes': null,
+    'media-feature-range-notation': null,
+    'no-empty-source': null,
+    'property-no-vendor-prefix': null,
+    'property-no-deprecated': null,
+    'scss/at-mixin-argumentless-call-parentheses': null,
+    'scss/double-slash-comment-empty-line-before': null,
+    'scss/dollar-variable-empty-line-before': null,
+    'scss/load-partial-extension': null,
+    'scss/no-global-function-names': null,
+    'scss/operator-no-unspaced': null,
+    'selector-attribute-quotes': null,
+    'selector-class-pattern': null,
+    'value-keyword-case': null,
+  },
+};

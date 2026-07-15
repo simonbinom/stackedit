@@ -1,6 +1,6 @@
 <template>
   <div class="side-bar__panel side-bar__panel--menu">
-    <menu-entry @click.native="manageWorkspaces">
+    <menu-entry @click="manageWorkspaces">
       <icon-database slot="icon"></icon-database>
       <div><div class="menu-entry__label menu-entry__label--count">{{workspaceCount}}</div> Manage workspaces</div>
       <span>List, rename, remove workspaces</span>
@@ -13,19 +13,19 @@
       </menu-entry>
     </div>
     <hr>
-    <menu-entry @click.native="addCouchdbWorkspace">
+    <menu-entry @click="addCouchdbWorkspace">
       <icon-provider slot="icon" provider-id="couchdbWorkspace"></icon-provider>
       <span>Add a <b>CouchDB</b> workspace</span>
     </menu-entry>
-    <menu-entry @click.native="addGithubWorkspace">
+    <menu-entry @click="addGithubWorkspace">
       <icon-provider slot="icon" provider-id="githubWorkspace"></icon-provider>
       <span>Add a <b>GitHub</b> workspace</span>
     </menu-entry>
-    <menu-entry @click.native="addGitlabWorkspace">
+    <menu-entry @click="addGitlabWorkspace">
       <icon-provider slot="icon" provider-id="gitlabWorkspace"></icon-provider>
       <span>Add a <b>GitLab</b> workspace</span>
     </menu-entry>
-    <menu-entry @click.native="addGoogleDriveWorkspace">
+    <menu-entry @click="addGoogleDriveWorkspace">
       <icon-provider slot="icon" provider-id="googleDriveWorkspace"></icon-provider>
       <span>Add a <b>Google Drive</b> workspace</span>
     </menu-entry>

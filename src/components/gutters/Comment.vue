@@ -10,7 +10,7 @@
         </button>
         <user-name :user-id="comment.sub"></user-name>
       </div>
-      <div class="comment__created">{{comment.created | formatTime}}</div>
+      <div class="comment__created">{{$formatTime(comment.created)}}</div>
     </div>
     <div class="comment__text">
       <div class="comment__text-inner" v-html="text"></div>

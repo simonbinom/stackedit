@@ -1,4 +1,4 @@
-import renderAbc from 'abcjs/src/api/abc_tunebook_svg';
+import { renderAbc } from 'abcjs';
 import extensionSvc from '../services/extensionSvc';
 
 const render = (elt) => {

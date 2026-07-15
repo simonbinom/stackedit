@@ -1,8 +1,8 @@
 import { shallowMount } from '@vue/test-utils';
 import store from '../../../src/store';
 import utils from '../../../src/services/utils';
-import '../../../src/icons';
-import '../../../src/components/common/vueGlobals';
+import installIcons from '../../../src/icons';
+import installVueGlobals from '../../../src/components/common/vueGlobals';
 
 const clone = object => JSON.parse(JSON.stringify(object));
 
@@ -19,6 +19,19 @@ const deepAssign = (target, origin) => {
 
 const freshState = clone(store.state);
 
+export const mountOptions = (options = {}) => ({
+  ...options,
+  global: {
+    ...(options.global || {}),
+    plugins: [
+      store,
+      installIcons,
+      installVueGlobals,
+      ...((options.global && options.global.plugins) || []),
+    ],
+  },
+});
+
 beforeEach(() => {
   // Restore store state before each test
   deepAssign(store.state, clone(freshState));
@@ -26,7 +39,7 @@ beforeEach(() => {
 
 export default {
   async checkToggler(Component, toggler, checker, featureId) {
-    const wrapper = shallowMount(Component, { store });
+    const wrapper = shallowMount(Component, mountOptions());
     const valueBefore = checker();
     toggler(wrapper);
     const valueAfter = checker();

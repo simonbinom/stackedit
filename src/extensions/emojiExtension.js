@@ -1,4 +1,4 @@
-import markdownItEmoji from 'markdown-it-emoji';
+import { full as markdownItEmoji } from 'markdown-it-emoji';
 import extensionSvc from '../services/extensionSvc';
 
 extensionSvc.onGetOptions((options, properties) => {

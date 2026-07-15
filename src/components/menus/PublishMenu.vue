@@ -6,12 +6,12 @@
     <div v-else>
       <div class="side-bar__info" v-if="publishLocations.length">
         <p>{{currentFileName}} is already published.</p>
-        <menu-entry @click.native="requestPublish">
+        <menu-entry @click="requestPublish">
           <icon-upload slot="icon"></icon-upload>
           <div>Publish now</div>
           <span>Update publications for {{currentFileName}}.</span>
         </menu-entry>
-        <menu-entry @click.native="managePublish">
+        <menu-entry @click="managePublish">
           <icon-view-list slot="icon"></icon-view-list>
           <div><div class="menu-entry__label menu-entry__label--count">{{locationCount}}</div> File publication</div>
           <span>Manage publication locations for {{currentFileName}}.</span>
@@ -22,90 +22,90 @@
       </div>
       <hr>
       <div v-for="token in bloggerTokens" :key="'blogger-' + token.sub">
-        <menu-entry @click.native="publishBlogger(token)">
+        <menu-entry @click="publishBlogger(token)">
           <icon-provider slot="icon" provider-id="blogger"></icon-provider>
           <div>Publish to Blogger</div>
           <span>{{token.name}}</span>
         </menu-entry>
-        <menu-entry @click.native="publishBloggerPage(token)">
+        <menu-entry @click="publishBloggerPage(token)">
           <icon-provider slot="icon" provider-id="bloggerPage"></icon-provider>
           <div>Publish to Blogger Page</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in dropboxTokens" :key="token.sub">
-        <menu-entry @click.native="publishDropbox(token)">
+        <menu-entry @click="publishDropbox(token)">
           <icon-provider slot="icon" provider-id="dropbox"></icon-provider>
           <div>Publish to Dropbox</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in githubTokens" :key="token.sub">
-        <menu-entry @click.native="publishGist(token)">
+        <menu-entry @click="publishGist(token)">
           <icon-provider slot="icon" provider-id="gist"></icon-provider>
           <div>Publish to Gist</div>
           <span>{{token.name}}</span>
         </menu-entry>
-        <menu-entry @click.native="publishGithub(token)">
+        <menu-entry @click="publishGithub(token)">
           <icon-provider slot="icon" provider-id="github"></icon-provider>
           <div>Publish to GitHub</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in gitlabTokens" :key="token.sub">
-        <menu-entry @click.native="publishGitlab(token)">
+        <menu-entry @click="publishGitlab(token)">
           <icon-provider slot="icon" provider-id="gitlab"></icon-provider>
           <div>Publish to GitLab</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in googleDriveTokens" :key="token.sub">
-        <menu-entry @click.native="publishGoogleDrive(token)">
+        <menu-entry @click="publishGoogleDrive(token)">
           <icon-provider slot="icon" provider-id="googleDrive"></icon-provider>
           <div>Publish to Google Drive</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in wordpressTokens" :key="token.sub">
-        <menu-entry @click.native="publishWordpress(token)">
+        <menu-entry @click="publishWordpress(token)">
           <icon-provider slot="icon" provider-id="wordpress"></icon-provider>
           <div>Publish to WordPress</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in zendeskTokens" :key="token.sub">
-        <menu-entry @click.native="publishZendesk(token)">
+        <menu-entry @click="publishZendesk(token)">
           <icon-provider slot="icon" provider-id="zendesk"></icon-provider>
           <div>Publish to Zendesk Help Center</div>
           <span>{{token.name}} — {{token.subdomain}}</span>
         </menu-entry>
       </div>
       <hr>
-      <menu-entry @click.native="addBloggerAccount">
+      <menu-entry @click="addBloggerAccount">
         <icon-provider slot="icon" provider-id="blogger"></icon-provider>
         <span>Add Blogger account</span>
       </menu-entry>
-      <menu-entry @click.native="addDropboxAccount">
+      <menu-entry @click="addDropboxAccount">
         <icon-provider slot="icon" provider-id="dropbox"></icon-provider>
         <span>Add Dropbox account</span>
       </menu-entry>
-      <menu-entry @click.native="addGithubAccount">
+      <menu-entry @click="addGithubAccount">
         <icon-provider slot="icon" provider-id="github"></icon-provider>
         <span>Add GitHub account</span>
       </menu-entry>
-      <menu-entry @click.native="addGitlabAccount">
+      <menu-entry @click="addGitlabAccount">
         <icon-provider slot="icon" provider-id="gitlab"></icon-provider>
         <span>Add GitLab account</span>
       </menu-entry>
-      <menu-entry @click.native="addGoogleDriveAccount">
+      <menu-entry @click="addGoogleDriveAccount">
         <icon-provider slot="icon" provider-id="googleDrive"></icon-provider>
         <span>Add Google Drive account</span>
       </menu-entry>
-      <menu-entry @click.native="addWordpressAccount">
+      <menu-entry @click="addWordpressAccount">
         <icon-provider slot="icon" provider-id="wordpress"></icon-provider>
         <span>Add WordPress account</span>
       </menu-entry>
-      <menu-entry @click.native="addZendeskAccount">
+      <menu-entry @click="addZendeskAccount">
         <icon-provider slot="icon" provider-id="zendesk"></icon-provider>
         <span>Add Zendesk account</span>
       </menu-entry>

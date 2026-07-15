@@ -1,5 +1,8 @@
-import Vue from 'vue';
+import { configureCompat } from 'vue';
 import './mocks/cryptoMock';
 import './mocks/mutationObserverMock';
 
-Vue.config.productionTip = false;
+configureCompat({
+  ATTR_ENUMERATED_COERCION: 'suppress-warning',
+  RENDER_FUNCTION: false,
+});

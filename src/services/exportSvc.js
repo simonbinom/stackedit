@@ -1,5 +1,4 @@
 import FileSaver from 'file-saver';
-import TemplateWorker from 'worker-loader!./templateWorker.js'; // eslint-disable-line
 import localDbSvc from './localDbSvc';
 import markdownConversionSvc from './markdownConversionSvc';
 import extensionSvc from './extensionSvc';
@@ -55,7 +54,7 @@ export default {
     const conversionCtx = markdownConversionSvc.convert(parsingCtx);
     const html = conversionCtx.htmlSectionList.map(htmlSanitizer.sanitizeHtml).join('');
     containerElt.innerHTML = html;
-    extensionSvc.sectionPreview(containerElt, options);
+    await extensionSvc.sectionPreview(containerElt, options);
 
     // Unwrap tables
     containerElt.querySelectorAll('.table-wrapper').cl_each((wrapperElt) => {
@@ -89,7 +88,7 @@ export default {
     containerElt.innerHTML = '';
 
     // Run template conversion in a Worker to prevent attacks from helpers
-    const worker = new TemplateWorker();
+    const worker = new Worker(new URL('./templateWorker.js', import.meta.url));
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         worker.terminate();

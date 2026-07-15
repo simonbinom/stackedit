@@ -1,44 +1,59 @@
-const request = require('request');
-const AWS = require('aws-sdk');
-const verifier = require('google-id-token-verifier');
+const { GetObjectCommand, PutObjectCommand, S3Client } = require('@aws-sdk/client-s3');
+const { OAuth2Client } = require('google-auth-library');
 const conf = require('./conf');
 
-const s3Client = new AWS.S3();
+const s3Client = new S3Client({});
+const googleAuthClient = new OAuth2Client(conf.values.googleClientId);
 
-const cb = (resolve, reject) => (err, res) => {
-  if (err) {
-    reject(err);
-  } else {
-    resolve(res);
+const bodyToString = (body) => {
+  if (!body) {
+    return Promise.resolve('');
+  }
+  if (typeof body === 'string') {
+    return Promise.resolve(body);
+  }
+  if (Buffer.isBuffer(body)) {
+    return Promise.resolve(body.toString('utf-8'));
+  }
+  if (typeof body.transformToString === 'function') {
+    return body.transformToString('utf-8');
+  }
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    body.on('data', chunk => chunks.push(chunk));
+    body.on('error', reject);
+    body.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
+  });
+};
+
+exports.getUser = async (id) => {
+  try {
+    const res = await s3Client.send(new GetObjectCommand({
+      Bucket: conf.values.userBucketName,
+      Key: id,
+    }));
+    return JSON.parse(await bodyToString(res.Body));
+  } catch (err) {
+    if (err.name !== 'NoSuchKey') {
+      throw err;
+    }
+    return undefined;
   }
 };
 
-exports.getUser = id => new Promise((resolve, reject) => {
-  s3Client.getObject({
-    Bucket: conf.values.userBucketName,
-    Key: id,
-  }, cb(resolve, reject));
-})
-  .then(
-    res => JSON.parse(res.Body.toString('utf-8')),
-    (err) => {
-      if (err.code !== 'NoSuchKey') {
-        throw err;
-      }
-    },
-  );
+exports.putUser = (id, user) => s3Client.send(new PutObjectCommand({
+  Bucket: conf.values.userBucketName,
+  Key: id,
+  Body: JSON.stringify(user),
+}));
 
-exports.putUser = (id, user) => new Promise((resolve, reject) => {
-  s3Client.putObject({
-    Bucket: conf.values.userBucketName,
-    Key: id,
-    Body: JSON.stringify(user),
-  }, cb(resolve, reject));
-});
-
-exports.getUserFromToken = idToken => new Promise((resolve, reject) => verifier
-  .verify(idToken, conf.values.googleClientId, cb(resolve, reject)))
-  .then(tokenInfo => exports.getUser(tokenInfo.sub));
+exports.getUserFromToken = async (idToken) => {
+  const ticket = await googleAuthClient.verifyIdToken({
+    idToken,
+    audience: conf.values.googleClientId,
+  });
+  return exports.getUser(ticket.getPayload().sub);
+};
 
 exports.userInfo = (req, res) => exports.getUserFromToken(req.query.idToken)
   .then(
@@ -76,19 +91,22 @@ exports.paypalIpn = (req, res, next) => Promise.resolve()
       return res.end();
     }
     // Processing PayPal IPN
-    req.body.cmd = '_notify-validate';
-    return new Promise((resolve, reject) => request.post({
-      uri: conf.values.paypalUri,
-      form: req.body,
-    }, (err, response, body) => {
-      if (err) {
-        reject(err);
-      } else if (body !== 'VERIFIED') {
-        reject(new Error('PayPal IPN unverified'));
-      } else {
-        resolve();
-      }
-    }))
+    const paypalBody = new URLSearchParams(Object.assign({}, req.body, {
+      cmd: '_notify-validate',
+    }));
+    return fetch(conf.values.paypalUri, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: paypalBody,
+    })
+      .then(response => response.text())
+      .then((verificationBody) => {
+        if (verificationBody !== 'VERIFIED') {
+          throw new Error('PayPal IPN unverified');
+        }
+      })
       .then(() => exports.putUser(userId, {
         paypalEmail,
         sponsorUntil,

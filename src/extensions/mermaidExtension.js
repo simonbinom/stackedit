@@ -1,4 +1,4 @@
-import 'mermaid';
+import mermaid from 'mermaid';
 import extensionSvc from '../services/extensionSvc';
 import utils from '../services/utils';
 
@@ -39,25 +39,20 @@ const config = {
   },
 };
 
-const containerElt = document.createElement('div');
-containerElt.className = 'hidden-rendering-container';
-document.body.appendChild(containerElt);
-
 let init = () => {
-  window.mermaid.initialize(config);
+  mermaid.initialize(config);
   init = () => {};
 };
 
-const render = (elt) => {
+const render = async (elt) => {
   try {
     init();
     const svgId = `mermaid-svg-${utils.uid()}`;
-    window.mermaid.mermaidAPI.render(svgId, elt.textContent, () => {
-      while (elt.firstChild) {
-        elt.removeChild(elt.lastChild);
-      }
-      elt.appendChild(containerElt.querySelector(`#${svgId}`));
-    }, containerElt);
+    const { svg, bindFunctions } = await mermaid.render(svgId, elt.textContent);
+    elt.innerHTML = svg;
+    if (bindFunctions) {
+      bindFunctions(elt);
+    }
   } catch (e) {
     console.error(e); // eslint-disable-line no-console
   }
@@ -68,6 +63,6 @@ extensionSvc.onGetOptions((options, properties) => {
 });
 
 extensionSvc.onSectionPreview((elt) => {
-  elt.querySelectorAll('.prism.language-mermaid')
-    .cl_each(diagramElt => render(diagramElt.parentNode));
+  return Promise.all(elt.querySelectorAll('.prism.language-mermaid')
+    .cl_map(diagramElt => render(diagramElt.parentNode)));
 });

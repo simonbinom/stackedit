@@ -2,9 +2,9 @@ import { shallowMount } from '@vue/test-utils';
 import Explorer from '../../../../src/components/Explorer';
 import store from '../../../../src/store';
 import workspaceSvc from '../../../../src/services/workspaceSvc';
-import specUtils from '../specUtils';
+import specUtils, { mountOptions } from '../specUtils';
 
-const mount = () => shallowMount(Explorer, { store });
+const mount = () => shallowMount(Explorer, mountOptions());
 const select = (id) => {
   store.commit('explorer/setSelectedId', id);
   expect(store.getters['explorer/selectedNode'].item.id).toEqual(id);

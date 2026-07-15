@@ -1,6 +1,5 @@
-import Vue from 'vue';
 import DiffMatchPatch from 'diff-match-patch';
-import Prism from 'prismjs';
+import Prism from './prismSvc';
 import markdownItPandocRenderer from 'markdown-it-pandoc-renderer';
 import cledit from './editor/cledit';
 import pagedown from '../libs/pagedown';
@@ -30,6 +29,47 @@ const diffMatchPatch = new DiffMatchPatch();
 let instantPreview = true;
 let tokens;
 
+const createEventBus = () => {
+  const listenersByEvent = {};
+  const getListeners = event =>
+    listenersByEvent[event] || (listenersByEvent[event] = new Set());
+
+  return {
+    $on(event, listener) {
+      getListeners(event).add(listener);
+      return this;
+    },
+    $off(event, listener) {
+      if (!event) {
+        Object.keys(listenersByEvent).forEach((eventName) => {
+          delete listenersByEvent[eventName];
+        });
+      } else if (!listener) {
+        getListeners(event).clear();
+      } else {
+        getListeners(event).forEach((registeredListener) => {
+          if (registeredListener === listener || registeredListener.$listener === listener) {
+            getListeners(event).delete(registeredListener);
+          }
+        });
+      }
+      return this;
+    },
+    $once(event, listener) {
+      const once = (...args) => {
+        this.$off(event, once);
+        listener(...args);
+      };
+      once.$listener = listener;
+      return this.$on(event, once);
+    },
+    $emit(event, ...args) {
+      getListeners(event).forEach(listener => listener(...args));
+      return this;
+    },
+  };
+};
+
 class SectionDesc {
   constructor(section, previewElt, tocElt, html) {
     this.section = section;
@@ -41,7 +81,7 @@ class SectionDesc {
 }
 
 // Use a vue instance as an event bus
-const editorSvc = Object.assign(new Vue(), editorSvcDiscussions, editorSvcUtils, {
+const editorSvc = Object.assign(createEventBus(), editorSvcDiscussions, editorSvcUtils, {
   // Elements
   editorElt: null,
   previewElt: null,
