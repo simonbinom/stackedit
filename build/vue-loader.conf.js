@@ -1,7 +1,1 @@
-module.exports = {
-  compilerOptions: {
-    compatConfig: {
-      MODE: 2
-    }
-  }
-}
+module.exports = {}

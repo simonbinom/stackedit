@@ -1,4 +1,4 @@
-import { configureCompat, createApp } from 'vue';
+import { createApp } from 'vue';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import { Workbox } from 'workbox-window';
@@ -13,11 +13,6 @@ import localDbSvc from './services/localDbSvc';
 if (!window.indexedDB) {
   throw new Error('Your browser is not supported. Please upgrade to the latest version.');
 }
-
-configureCompat({
-  ATTR_ENUMERATED_COERCION: 'suppress-warning',
-  RENDER_FUNCTION: false,
-});
 
 if (NODE_ENV === 'production' && 'serviceWorker' in navigator) {
   const workbox = new Workbox('/sw.js');

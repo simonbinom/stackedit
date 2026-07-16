@@ -247,7 +247,9 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../styles/variables.scss';
+@use 'sass:color';
+@use 'sass:math';
+@use '../styles/variables' as *;
 
 .navigation-bar {
   position: absolute;
@@ -442,12 +444,12 @@ export default {
 }
 
 .navigation-bar__button--close {
-  color: lighten($link-color, 15%);
+  color: color.adjust($link-color, $lightness: 15%);
 
   &:active,
   &:focus,
   &:hover {
-    color: lighten($link-color, 25%);
+    color: color.adjust($link-color, $lightness: 25%);
   }
 }
 
@@ -465,7 +467,7 @@ export default {
 
 $r: 10px;
 $d: $r * 2;
-$b: $d/10;
+$b: math.div($d, 10);
 $t: 3000ms;
 
 .navigation-bar__spinner {
@@ -475,7 +477,7 @@ $t: 3000ms;
   .icon {
     width: 24px;
     height: 24px;
-    color: transparentize($error-color, 0.5);
+    color: color.adjust($error-color, $alpha: -0.5);
   }
 }
 
@@ -484,7 +486,7 @@ $t: 3000ms;
   height: $d;
   display: block;
   position: relative;
-  border: $b solid transparentize($navbar-color, 0.5);
+  border: $b solid color.adjust($navbar-color, $alpha: -0.5);
   border-radius: 50%;
   margin: 2px;
 
@@ -510,7 +512,7 @@ $t: 3000ms;
     height: $r * 0.6;
     left: $r - $b * 1.5;
     top: 50%;
-    animation: spin $t/4 linear infinite;
+    animation: spin math.div($t, 4) linear infinite;
   }
 }
 

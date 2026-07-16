@@ -33,6 +33,8 @@ COPY server ./server
 COPY static ./static
 COPY --from=build /opt/stackedit/dist ./dist
 
+USER node
+
 EXPOSE 8080
 
 CMD [ "node", "." ]

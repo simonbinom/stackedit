@@ -183,7 +183,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../styles/variables.scss';
+@use '../../styles/variables' as *;
 
 .comment-list {
   position: absolute;

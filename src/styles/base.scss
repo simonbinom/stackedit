@@ -1,7 +1,5 @@
-@import '../../node_modules/normalize-scss/sass/normalize';
-@import './variables';
-
-@include normalize();
+@use '../../node_modules/normalize.css/normalize';
+@use './variables' as *;
 
 html,
 body {

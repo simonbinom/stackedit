@@ -1,4 +1,5 @@
-@import './variables.scss';
+@use 'sass:color';
+@use './variables' as *;
 
 body {
   background-color: #fff;
@@ -164,7 +165,7 @@ textarea {
   &:focus,
   &:hover {
     color: #fff;
-    background-color: darken(#349be8, 8%);
+    background-color: color.adjust(#349be8, $lightness: -8%);
   }
 }
 
@@ -308,20 +309,20 @@ textarea {
 
 .discussion-editor-highlighting,
 .discussion-preview-highlighting {
-  background-color: mix($editor-background-light, $selection-highlighting-color, 70%);
+  background-color: color.mix($editor-background-light, $selection-highlighting-color, $weight: 70%);
   padding: 0.25em 0;
 
   .app--dark & {
-    background-color: mix($editor-background-dark, $selection-highlighting-color, 70%);
+    background-color: color.mix($editor-background-dark, $selection-highlighting-color, $weight: 70%);
   }
 }
 
 .discussion-editor-highlighting--hover,
 .discussion-preview-highlighting--hover {
-  background-color: mix($editor-background-light, $selection-highlighting-color, 50%);
+  background-color: color.mix($editor-background-light, $selection-highlighting-color, $weight: 50%);
 
   .app--dark & {
-    background-color: mix($editor-background-dark, $selection-highlighting-color, 50%);
+    background-color: color.mix($editor-background-dark, $selection-highlighting-color, $weight: 50%);
   }
 
   * {
@@ -331,10 +332,10 @@ textarea {
 
 .discussion-editor-highlighting--selected,
 .discussion-preview-highlighting--selected {
-  background-color: mix($editor-background-light, $selection-highlighting-color, 20%);
+  background-color: color.mix($editor-background-light, $selection-highlighting-color, $weight: 20%);
 
   .app--dark & {
-    background-color: mix($editor-background-dark, $selection-highlighting-color, 20%);
+    background-color: color.mix($editor-background-dark, $selection-highlighting-color, $weight: 20%);
   }
 
   * {

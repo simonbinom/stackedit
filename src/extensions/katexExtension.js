@@ -1,6 +1,14 @@
-import katex from 'katex';
 import markdownItMath from './libs/markdownItMath';
 import extensionSvc from '../services/extensionSvc';
+
+let katexPromise;
+const getKatex = () => {
+  if (!katexPromise) {
+    katexPromise = import(/* webpackChunkName: "katex" */ 'katex')
+      .then(({ default: katex }) => katex);
+  }
+  return katexPromise;
+};
 
 extensionSvc.onGetOptions((options, properties) => {
   options.math = properties.extensions.katex.enabled;
@@ -16,9 +24,15 @@ extensionSvc.onInitConverter(2, (markdown, options) => {
   }
 });
 
-extensionSvc.onSectionPreview((elt) => {
+extensionSvc.onSectionPreview(async (elt) => {
+  const inlineElements = elt.querySelectorAll('.katex--inline');
+  const displayElements = elt.querySelectorAll('.katex--display');
+  if (!inlineElements.length && !displayElements.length) {
+    return;
+  }
+  const katex = await getKatex();
   const highlighter = displayMode => (katexElt) => {
-    if (!katexElt.highlighted) {
+    if (katexElt.isConnected && !katexElt.highlighted) {
       try {
         katex.render(katexElt.textContent, katexElt, { displayMode });
       } catch (e) {
@@ -27,6 +41,6 @@ extensionSvc.onSectionPreview((elt) => {
     }
     katexElt.highlighted = true;
   };
-  elt.querySelectorAll('.katex--inline').cl_each(highlighter(false));
-  elt.querySelectorAll('.katex--display').cl_each(highlighter(true));
+  inlineElements.cl_each(highlighter(false));
+  displayElements.cl_each(highlighter(true));
 });

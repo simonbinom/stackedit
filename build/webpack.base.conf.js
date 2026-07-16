@@ -23,8 +23,7 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {
-      '@': resolve('src'),
-      vue: '@vue/compat'
+      '@': resolve('src')
     },
     fallback: {
       // For mermaid: jison generated code requires `fs`.

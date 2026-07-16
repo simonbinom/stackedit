@@ -54,8 +54,10 @@ export default modalTemplate({
           const { body } = await networkSvc.request({
             method: 'POST',
             url: 'pdfExport',
+            headers: {
+              Authorization: sponsorToken && `Bearer ${sponsorToken.idToken}`,
+            },
             params: {
-              idToken: sponsorToken && sponsorToken.idToken,
               options: JSON.stringify(store.getters['data/computedSettings'].wkhtmltopdf),
             },
             body: html,

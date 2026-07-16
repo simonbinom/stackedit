@@ -106,7 +106,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../styles/variables.scss';
+@use '../styles/variables' as *;
 
 .preview,
 .preview__inner-1 {

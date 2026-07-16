@@ -10,7 +10,8 @@
 </template>
 
 <style lang="scss">
-@import '../../../styles/variables.scss';
+@use 'sass:color';
+@use '../../../styles/variables' as *;
 
 .menu-entry {
   text-align: left;
@@ -77,7 +78,7 @@
 
 .menu-entry__label--warning {
   color: #fff;
-  background-color: darken($error-color, 10);
+  background-color: color.adjust($error-color, $lightness: -10%);
   opacity: 1;
 }
 

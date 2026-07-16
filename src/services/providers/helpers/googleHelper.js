@@ -198,8 +198,8 @@ export default {
         const res = await networkSvc.request({
           method: 'GET',
           url: 'userInfo',
-          params: {
-            idToken: token.idToken,
+          headers: {
+            Authorization: `Bearer ${token.idToken}`,
           },
         });
         token.isSponsor = res.body.sponsorUntil > Date.now();

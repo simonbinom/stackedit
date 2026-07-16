@@ -52,8 +52,10 @@ export default modalTemplate({
           const { body } = await networkSvc.request({
             method: 'POST',
             url: 'pandocExport',
+            headers: {
+              Authorization: sponsorToken && `Bearer ${sponsorToken.idToken}`,
+            },
             params: {
-              idToken: sponsorToken && sponsorToken.idToken,
               format: selectedFormat,
               options: JSON.stringify(store.getters['data/computedSettings'].pandoc),
               metadata: JSON.stringify(currentContent.properties),

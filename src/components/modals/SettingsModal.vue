@@ -104,7 +104,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../styles/variables.scss';
+@use '../../styles/variables' as *;
 
 .modal__inner-1.modal__inner-1--settings {
   max-width: 560px;
