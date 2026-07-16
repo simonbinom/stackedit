@@ -9,10 +9,14 @@ googleApiKey: ""
 githubClientId: ""
 githubClientSecret: ""
 wordpressClientId: ""
+# Legacy chart value; WordPress currently uses browser-side implicit OAuth and no secret.
 wordpressSecret: ""
 paypalReceiverEmail: ""
 awsAccessKeyId: ""
 awsSecretAccessKey: ""
+# Name of a Secret containing any of: githubClientSecret, wordpressSecret,
+# awsAccessKeyId, awsSecretAccessKey. When empty, the chart creates a Secret from
+# the values above.
 existingSecret: ""
 
 exportMaxConcurrent: 2
@@ -50,8 +54,7 @@ ingress:
   enabled: false
   annotations:
    # kubernetes.io/ingress.class: nginx
-   # certmanager.k8s.io/issuer: letsencrypt-prod
-   # certmanager.k8s.io/acme-challenge-type: http01
+   # cert-manager.io/cluster-issuer: letsencrypt-prod
   hosts: []
    # - host: stackedit.example.com
    #   paths:

@@ -5,27 +5,30 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 ## Commands
 
 ```bash
-npm install          # also runs `gulp build-prism` via postinstall (builds prismjs/prism.js from selected components)
+npm ci --legacy-peer-deps  # reproducible install from package-lock.json (same as CI and Docker)
+npm install --legacy-peer-deps # use when intentionally changing dependencies
 npm start            # dev server with hot reload at localhost:8080 (build/dev-server.js)
-npm run build        # production build: build/build.js, then webpack for style (build-style)
-npm run lint         # eslint --ext .js,.vue src server
+npm run build        # app build + standalone style bundle + initial bundle-size check
+npm run check-bundle-size
+npm run lint         # ESLint for JS/Vue plus Stylelint for SCSS/Vue styles
 npm run unit         # jest --config test/unit/jest.conf.js --runInBand
 npm run unit-with-coverage
 npm test             # lint + unit (also runs as preversion hook)
 ```
 
-Run a single test file: `npx jest --config test/unit/jest.conf.js --runInBand test/unit/specs/components/<Name>.spec.js`
+Run a single test file: `npx jest --config test/unit/jest.conf.js --runInBand test/unit/specs/<path>.spec.js`
 
 Version bump commands (`npm run patch|minor|major`) run `npm version`, which triggers `preversion` (full test suite) and `postversion` (push to origin master with tags + `npm publish`) — these have real side effects (git push, npm publish).
 
 ## Architecture
 
-StackEdit is a client-heavy Vue 2 / Vuex 3 Markdown editor (webpack 2, Babel with `stage-2`/`env` presets — pre-ES-modules-native tooling). There's also a thin Express server for a few backend-only concerns.
+StackEdit is a client-heavy Vue 3 / Vuex 4 Markdown editor built with Webpack 5 and Babel 7. Most components still use the Options API, but they run natively on Vue 3 without the migration build. A thin Express 4 server handles backend-only concerns. Node.js 22+ and npm 10+ are required.
 
 ### Client vs server split
 
-- `src/` — the entire Vue app; this is where almost all logic lives. Built as a static bundle (offline-first PWA via `offline-plugin`, service worker install/update flow in `src/index.js`).
-- `server/` — a small Express app (`server/index.js`) mounted by `build/dev-server.js` in dev and served standalone in production. It exists only for things the browser can't do itself: GitHub OAuth token exchange (`github.js`), user/PayPal sponsorship info backed by an S3-ish user bucket (`user.js`), server-side PDF export via wkhtmltopdf (`pdf.js`), and Pandoc export (`pandoc.js`). Config/secrets (OAuth client IDs/secrets, API keys, PayPal receiver) come from env vars, centralized in `server/conf.js` (`values` = private, `publicValues` = what's exposed to the client via `GET /conf`).
+- `src/` — the Vue app and almost all application logic. The production build is an offline-first PWA generated with Workbox; `src/index.js` registers updates and requires native IndexedDB support.
+- `server/` — a small Express app (`server/index.js`) mounted by `build/dev-server.js` in development and served standalone in production. It handles GitHub OAuth token exchange (`github.js`), optional user/PayPal sponsorship information backed by S3 (`user.js`), PDF export through wkhtmltopdf (`pdf.js`), and Pandoc export (`pandoc.js`). Configuration comes from environment variables centralized in `server/conf.js` (`values` stays server-side; `publicValues` is returned by `GET /conf`).
+- Export endpoints share bounded input/concurrency middleware (`exportSecurity.js`), document and remote-resource validation (`exportDocumentPolicy.js`), and converter lifecycle/timeout handling (`exportProcess.js`). Remote export resources are allowlisted by `EXPORT_REMOTE_HOSTS`, and private/reserved network addresses are always rejected.
 - Nearly all real work — editing, sync, conflict resolution, rendering — happens client-side; the server has no database and holds no document data.
 
 ### Vuex store (`src/store/`)
@@ -45,7 +48,7 @@ This is the most important subsystem to understand before changing sync behavior
 
 - `workspaceSvc.js` — manages the current **workspace** (a "workspace" = a syncable root, e.g. the local browser workspace or a GitHub/GitLab/Google Drive-backed workspace).
 - `syncSvc.js` — the core sync engine: reconciles local content against remote provider state, handles conflicts.
-- `localDbSvc.js` — persistence to IndexedDB (via `indexeddbshim` for browsers lacking native support) plus the `sync()` entry point called after service-worker updates.
+- `localDbSvc.js` — persistence to native IndexedDB plus the `sync()` entry point called after service-worker updates.
 - `gitWorkspaceSvc.js` — workspace variant specifically for git-backed providers, works with the `gitPathsByItemId` getters above.
 - `src/services/providers/` — one file per external backend (Dropbox, GitHub, GitHub-as-workspace, GitLab, GitLab-as-workspace, Google Drive, Google Drive AppData, Google Drive-as-workspace, Gist, CouchDB-as-workspace, Blogger, Blogger Page, WordPress, Zendesk). Providers split into **content providers** (used for one-off sync/publish targets) vs **workspace providers** (the whole workspace lives in that backend). `common/` and `helpers/` hold shared provider logic (e.g. OAuth dance helpers).
 - `extensionSvc.js` + `src/extensions/` — pluggable Markdown rendering extensions (emoji, ABC notation via `abcjs`, KaTeX math, Mermaid diagrams, core markdown-it config). Extensions register into the markdown-it pipeline; `markdownGrammarSvc.js` and `markdownConversionSvc.js` handle grammar highlighting and format conversion (e.g. via `turndown` for HTML→Markdown).
@@ -58,9 +61,10 @@ Flat-ish structure, one `.vue` file per major UI piece (`Editor.vue`, `Preview.v
 
 ### Build system specifics
 
-- Webpack 2, split by env: `build/webpack.base.conf.js`, `.dev.conf.js`, `.prod.conf.js`, plus a separate `build/webpack.style.conf.js` just for CSS (`npm run build-style`), because the app ships `style.css` separately from the JS bundle (see `server/index.js` serving `/style.css` with its own cache header, distinct from `/static`).
-- `prismjs` syntax highlighting is not used off-the-shelf: `postinstall` runs `gulp build-prism` (see `gulpfile.js`) to concatenate a curated subset of Prism language components into a single `prism.js` inside `node_modules/prismjs`, which the rest of the build then imports. If Prism-related code/highlighting seems broken after a fresh `npm install`, check this step ran.
-- `NODE_ENV` and `VERSION` are injected as webpack globals/ESLint globals (see `.eslintrc.js`), not read from `process.env` in client code.
+- Webpack 5 is split by environment across `build/webpack.base.conf.js`, `.dev.conf.js`, and `.prod.conf.js`. `build/webpack.style.conf.js` produces the standalone `/style.css` bundle, which the server caches separately from hashed `/static` assets.
+- Workbox's `GenerateSW` plugin creates `dist/sw.js`. Initial JavaScript and CSS budgets are enforced by `build/check-bundle-size.js` after production builds.
+- Prism uses its core package plus explicit language imports in `src/services/prismLanguages.js`; there is no generated `node_modules/prismjs/prism.js` or Gulp postinstall step.
+- `NODE_ENV`, `VERSION`, and selected OAuth client IDs are injected as Webpack globals rather than read from `process.env` by browser code.
 - `browserslist` targets `> 1%, last 2 versions, not ie <= 10`.
 
 # Behavioral guidelines to reduce coding mistakes.

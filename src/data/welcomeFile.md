@@ -25,28 +25,27 @@ You can delete the current file by clicking the **Remove** button in the file ex
 
 ## Export a file
 
-You can export the current file by clicking **Export to disk** in the menu. You can choose to export the file as plain Markdown, as HTML using a Handlebars template or as a PDF.
+You can export the current file from the import/export menu. You can choose plain Markdown, HTML using a Handlebars template, PDF, or a Pandoc-supported format.
 
 
 # Synchronization
 
-Synchronization is one of the biggest features of StackEdit. It enables you to synchronize any file in your workspace with other files stored in your **Google Drive**, your **Dropbox** and your **GitHub** accounts. This allows you to keep writing on other devices, collaborate with people you share the file with, integrate easily into your workflow... The synchronization mechanism takes place every minute in the background, downloading, merging, and uploading file modifications.
+Synchronization is one of the biggest features of StackEdit. It enables you to synchronize files with **Google Drive**, **Dropbox**, **GitHub**, **GitLab**, and **Gist**. This allows you to keep writing on other devices, collaborate with people you share the file with, and integrate StackEdit into your workflow. The synchronization mechanism runs in the background, downloading, merging, and uploading file modifications.
 
 There are two types of synchronization and they can complement each other:
 
-- The workspace synchronization will sync all your files, folders and settings automatically. This will allow you to fetch your workspace on any other device.
-	> To start syncing your workspace, just sign in with Google in the menu.
+- Workspace synchronization syncs all your files, folders, and settings automatically. Sign in with Google to use the Google Drive app-data workspace, or add a Google Drive, GitHub, GitLab, or CouchDB workspace from the workspace menu.
 
-- The file synchronization will keep one file of the workspace synced with one or multiple files in **Google Drive**, **Dropbox** or **GitHub**.
+- File synchronization keeps one workspace file synchronized with one or more provider locations.
 	> Before starting to sync files, you must link an account in the **Synchronize** sub-menu.
 
 ## Open a file
 
-You can open a file from **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Open from**. Once opened in the workspace, any modification in the file will be automatically synced.
+You can open a file from **Google Drive**, **Dropbox**, **GitHub**, or **GitLab** by choosing the corresponding **Open from** action in the **Synchronize** sub-menu. Once opened in the workspace, modifications to the file are automatically synchronized.
 
 ## Save a file
 
-You can save any file of the workspace to **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Save on**. Even if a file in the workspace is already synced, you can save it to another location. StackEdit can sync one file with multiple locations and accounts.
+You can save a workspace file to **Google Drive**, **Dropbox**, **GitHub**, **GitLab**, or **Gist** by choosing the corresponding **Save on** action in the **Synchronize** sub-menu. Even if the file is already synchronized, you can save it to another location. StackEdit can synchronize one file with multiple locations and accounts.
 
 ## Synchronize a file
 
@@ -63,7 +62,7 @@ Since one file can be synced with multiple locations, you can list and manage sy
 
 # Publication
 
-Publishing in StackEdit makes it simple for you to publish online your files. Once you're happy with a file, you can publish it to different hosting platforms like **Blogger**, **Dropbox**, **Gist**, **GitHub**, **Google Drive**, **WordPress** and **Zendesk**. With [Handlebars templates](http://handlebarsjs.com/), you have full control over what you export.
+Publishing in StackEdit makes it simple to publish files online. You can publish to **Blogger**, **Dropbox**, **Gist**, **GitHub**, **GitLab**, **Google Drive**, **WordPress**, and **Zendesk**. With [Handlebars templates](https://handlebarsjs.com/), you have full control over the exported HTML.
 
 > Before starting to publish, you must link an account in the **Publish** sub-menu.
 
@@ -105,7 +104,7 @@ SmartyPants converts ASCII punctuation characters into "smart" typographic punct
 
 ## KaTeX
 
-You can render LaTeX mathematical expressions using [KaTeX](https://khan.github.io/KaTeX/):
+You can render LaTeX mathematical expressions using [KaTeX](https://katex.org/):
 
 The *Gamma function* satisfying $\Gamma(n) = (n-1)!\quad\forall n\in\mathbb N$ is via the Euler integral
 
@@ -113,12 +112,12 @@ $$
 \Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,.
 $$
 
-> You can find more information about **LaTeX** mathematical expressions [here](http://meta.math.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference).
+> You can find more information about **LaTeX** mathematical expressions [here](https://math.meta.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference).
 
 
 ## UML diagrams
 
-You can render UML diagrams using [Mermaid](https://mermaidjs.github.io/). For example, this will produce a sequence diagram:
+You can render diagrams using [Mermaid](https://mermaid.js.org/). For example, this will produce a sequence diagram:
 
 ```mermaid
 sequenceDiagram
