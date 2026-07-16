@@ -6,4 +6,4 @@ We recommend syncing your workspace to make sure files won't be lost in case you
 
 **Can StackEdit access my data without telling me?**
 
-StackEdit is a browser-based application. The access tokens issued by Google, Dropbox, GitHub... are stored in your browser and are not sent to any kind of backend or 3^rd^ party so your data won't be accessed by anyone.
+StackEdit stores provider access tokens in your browser and calls provider APIs directly. The StackEdit server does not persist those tokens or your documents. GitHub is the exception during sign-in: the browser sends the short-lived authorization code to the StackEdit server, which exchanges it for an access token and immediately returns it to the browser.
