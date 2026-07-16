@@ -1,11 +1,17 @@
 {
   "name": "stackedit",
-  "version": "5.15.4",
+  "version": "5.15.5",
+  "private": true,
   "description": "Free, open-source, full-featured Markdown editor",
   "author": "Benoit Schweblin",
   "license": "Apache-2.0",
+  "homepage": "https://github.com/simonbinom/stackedit",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simonbinom/stackedit.git"
+  },
   "bugs": {
-    "url": "https://github.com/benweet/stackedit/issues"
+    "url": "https://github.com/simonbinom/stackedit/issues"
   },
   "main": "index.js",
   "scripts": {
@@ -19,11 +25,6 @@
     "unit": "jest --config test/unit/jest.conf.js --runInBand",
     "unit-with-coverage": "jest --config test/unit/jest.conf.js --runInBand --coverage",
     "test": "npm run lint && npm run unit",
-    "preversion": "npm run test",
-    "postversion": "git push origin master --tags && npm publish",
-    "patch": "npm version patch -m \"Tag v%s\"",
-    "minor": "npm version minor -m \"Tag v%s\"",
-    "major": "npm version major -m \"Tag v%s\"",
     "chart": "mkdir -p dist && rm -rf dist/stackedit && cp -r chart dist/stackedit && sed -i.bak -e s/STACKEDIT_VERSION/$npm_package_version/g dist/stackedit/*.yaml && rm dist/stackedit/*.yaml.bak"
   },
   "dependencies": {

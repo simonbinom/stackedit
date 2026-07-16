@@ -13,12 +13,12 @@ npm run check-bundle-size
 npm run lint         # ESLint for JS/Vue plus Stylelint for SCSS/Vue styles
 npm run unit         # jest --config test/unit/jest.conf.js --runInBand
 npm run unit-with-coverage
-npm test             # lint + unit (also runs as preversion hook)
+npm test             # lint + unit
 ```
 
 Run a single test file: `npx jest --config test/unit/jest.conf.js --runInBand test/unit/specs/<path>.spec.js`
 
-Version bump commands (`npm run patch|minor|major`) run `npm version`, which triggers `preversion` (full test suite) and `postversion` (push to origin master with tags + `npm publish`) — these have real side effects (git push, npm publish).
+Releases are published by `.github/workflows/release.yml` from `v*` tags. The tag must equal `v` plus the version in `package.json`; for example, package version `5.15.5` requires tag `v5.15.5`. The workflow tests the tagged commit, publishes a multi-architecture image to `ghcr.io/simonbinom/stackedit`, and publishes the matching OCI chart to `oci://ghcr.io/simonbinom/charts/stackedit`. Prepare a future version with `npm version <version> --no-git-tag-version`, merge it, and only then create the matching tag. The project is private to npm and must not be published there.
 
 ## Architecture
 

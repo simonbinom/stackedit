@@ -27,8 +27,8 @@ exportTimeoutMs: 50000
 replicaCount: 1
 
 image:
-  repository: benweet/stackedit
-  tag: vSTACKEDIT_VERSION
+  repository: ghcr.io/simonbinom/stackedit
+  tag: STACKEDIT_VERSION
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []

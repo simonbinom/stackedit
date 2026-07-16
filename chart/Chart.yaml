@@ -1,5 +1,13 @@
-apiVersion: v1
-appVersion: vSTACKEDIT_VERSION
+apiVersion: v2
+appVersion: "STACKEDIT_VERSION"
 description: In-browser Markdown editor
+home: https://github.com/simonbinom/stackedit
+icon: https://raw.githubusercontent.com/simonbinom/stackedit/master/src/assets/favicon.png
+maintainers:
+  - name: simonbinom
+    url: https://github.com/simonbinom
 name: stackedit
+sources:
+  - https://github.com/simonbinom/stackedit
+type: application
 version: STACKEDIT_VERSION
