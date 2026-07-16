@@ -35,13 +35,13 @@ spec:
             - name: PORT
               value: "8080"
             - name: EXPORT_MAX_CONCURRENT
-              value: {{ .Values.exportMaxConcurrent | quote }}
+              value: {{ .Values.exportMaxConcurrent | int64 | quote }}
             - name: EXPORT_MAX_INPUT_BYTES
-              value: {{ .Values.exportMaxInputBytes | quote }}
+              value: {{ .Values.exportMaxInputBytes | int64 | quote }}
             - name: EXPORT_REMOTE_HOSTS
               value: {{ .Values.exportRemoteHosts | quote }}
             - name: EXPORT_TIMEOUT_MS
-              value: {{ .Values.exportTimeoutMs | quote }}
+              value: {{ .Values.exportTimeoutMs | int64 | quote }}
             - name: PAYPAL_RECEIVER_EMAIL
               value: {{ .Values.paypalReceiverEmail | quote }}
             - name: AWS_ACCESS_KEY_ID

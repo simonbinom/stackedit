@@ -5,8 +5,9 @@ on:
   push:
     branches:
       - master
-    tags:
-      - v*
+
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -17,8 +18,8 @@ jobs:
           - 22.x
           - 24.x
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
@@ -27,21 +28,11 @@ jobs:
       - run: npm run unit-with-coverage
       - if: matrix.node-version == '24.x'
         run: npm run build
-
-  deploy:
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: test
-    runs-on: ubuntu-latest
-    env:
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      CHARTS_GITHUB_TOKEN: ${{ secrets.CHARTS_GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24.x
-          cache: npm
-      - run: npm ci --legacy-peer-deps
-      - run: docker build -t benweet/stackedit .
-      - uses: azure/setup-helm@v4
-      - run: bash build/deploy.sh
+      - if: matrix.node-version == '24.x'
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+      - if: matrix.node-version == '24.x'
+        run: npm run chart
+      - if: matrix.node-version == '24.x'
+        run: helm lint dist/stackedit
+      - if: matrix.node-version == '24.x'
+        run: docker build --tag stackedit:ci .

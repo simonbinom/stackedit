@@ -1,6 +1,6 @@
 # StackEdit
 
-[![CI](https://github.com/simonbinom/stackedit/actions/workflows/ci.yml/badge.svg)](https://github.com/simonbinom/stackedit/actions/workflows/ci.yml) [![NPM version](https://img.shields.io/npm/v/stackedit.svg?style=flat)](https://www.npmjs.org/package/stackedit)
+[![CI](https://github.com/simonbinom/stackedit/actions/workflows/ci.yml/badge.svg)](https://github.com/simonbinom/stackedit/actions/workflows/ci.yml)
 
 > Full-featured, open-source Markdown editor based on PageDown, the Markdown library used by Stack Overflow and the other Stack Exchange sites.
 
@@ -31,27 +31,20 @@ npm run build --report
 
 The client uses Vue 3, Vuex 4, Webpack 5, and Workbox. The production runtime is a small Express server on Node.js 22; it serves the app and handles OAuth token exchange, sponsorship data, and PDF/Pandoc exports.
 
-## Deploy the current source with Helm
+## Deploy with Helm
 
-The public Helm repository tracks tagged releases and can lag behind `master`. The following workflow builds an image and chart from the current checkout so both artifacts contain the same code. Push the image to a registry accessible by your Kubernetes cluster.
+Tagged releases publish a matching multi-architecture image and OCI Helm chart to the GitHub Container Registry. OCI charts do not require `helm repo add`.
 
 ```bash
-export STACKEDIT_IMAGE=registry.example.com/stackedit
-export STACKEDIT_TAG=modernized
-
-docker build -t "${STACKEDIT_IMAGE}:${STACKEDIT_TAG}" .
-docker push "${STACKEDIT_IMAGE}:${STACKEDIT_TAG}"
-
-# replace the release placeholders and write the chart to dist/stackedit
-npm run chart
+export STACKEDIT_VERSION=5.15.5
 
 # keep server-side credentials out of Helm values and shell history
 kubectl create secret generic stackedit-secrets \
   --from-literal=githubClientSecret="${GITHUB_CLIENT_SECRET}"
 
-helm upgrade --install stackedit ./dist/stackedit \
-  --set image.repository="${STACKEDIT_IMAGE}" \
-  --set image.tag="${STACKEDIT_TAG}" \
+helm upgrade --install stackedit \
+  oci://ghcr.io/simonbinom/charts/stackedit \
+  --version "${STACKEDIT_VERSION}" \
   --set existingSecret=stackedit-secrets \
   --set dropboxAppKey="${DROPBOX_API_KEY}" \
   --set dropboxAppKeyFull="${DROPBOX_FULL_ACCESS_API_KEY}" \
@@ -78,7 +71,9 @@ To enable an existing ingress controller and cert-manager issuer:
 
 ```bash
 # See https://cert-manager.io/docs/tutorials/acme/nginx-ingress/
-helm upgrade stackedit ./dist/stackedit \
+helm upgrade stackedit \
+  oci://ghcr.io/simonbinom/charts/stackedit \
+  --version "${STACKEDIT_VERSION}" \
   --reuse-values \
   --set ingress.enabled=true \
   --set 'ingress.annotations.kubernetes\.io/ingress\.class=nginx' \
