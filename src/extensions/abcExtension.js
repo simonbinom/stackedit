@@ -1,8 +1,19 @@
-import { renderAbc } from 'abcjs';
 import extensionSvc from '../services/extensionSvc';
 
-const render = (elt) => {
+let abcPromise;
+const getAbc = () => {
+  if (!abcPromise) {
+    abcPromise = import(/* webpackChunkName: "abc" */ 'abcjs');
+  }
+  return abcPromise;
+};
+
+const render = async (elt) => {
   const content = elt.textContent;
+  const { renderAbc } = await getAbc();
+  if (!elt.parentNode || !elt.parentNode.parentNode) {
+    return;
+  }
   // Create a div element
   const divElt = document.createElement('div');
   divElt.className = 'abc-notation-block';
@@ -16,6 +27,6 @@ extensionSvc.onGetOptions((options, properties) => {
 });
 
 extensionSvc.onSectionPreview((elt) => {
-  elt.querySelectorAll('.prism.language-abc')
-    .cl_each(notationElt => render(notationElt));
+  return Promise.all(elt.querySelectorAll('.prism.language-abc')
+    .cl_map(notationElt => render(notationElt)));
 });

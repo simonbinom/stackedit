@@ -204,7 +204,8 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../styles/variables.scss';
+@use 'sass:color';
+@use '../styles/variables' as *;
 
 .modal {
   position: absolute;
@@ -222,8 +223,11 @@ export default {
   position: fixed;
   z-index: 1;
   width: 100%;
-  color: darken($error-color, 10%);
-  background-color: transparentize(lighten($error-color, 33%), 0.075);
+  color: color.adjust($error-color, $lightness: -10%);
+  background-color: color.adjust(
+    color.adjust($error-color, $lightness: 33%),
+    $alpha: -0.075
+  );
   font-size: 0.9em;
   line-height: 1.33;
   text-align: center;
@@ -336,11 +340,11 @@ export default {
   color: #808080;
 
   .form-entry--focused & {
-    color: darken($link-color, 10%);
+    color: color.adjust($link-color, $lightness: -10%);
   }
 
   .form-entry--error & {
-    color: darken($error-color, 10%);
+    color: color.adjust($error-color, $lightness: -10%);
   }
 }
 
@@ -356,12 +360,12 @@ export default {
 
   .form-entry--focused & {
     border-color: $link-color;
-    box-shadow: 0 0 0 2.5px transparentize($link-color, 0.67);
+    box-shadow: 0 0 0 2.5px color.adjust($link-color, $alpha: -0.67);
   }
 
   .form-entry--error & {
     border-color: $error-color;
-    box-shadow: 0 0 0 2.5px transparentize($error-color, 0.67);
+    box-shadow: 0 0 0 2.5px color.adjust($error-color, $alpha: -0.67);
   }
 }
 

@@ -9,7 +9,6 @@ module.exports = {
     'vue',
   ],
   moduleNameMapper: {
-    '^vue$': '@vue/compat',
     '\\.(css|scss)$': 'identity-obj-proxy',
     '\\?raw$': '<rootDir>/test/unit/mocks/rawFileMock',
   },
@@ -22,8 +21,17 @@ module.exports = {
     '<rootDir>/test/unit/setup',
   ],
   coverageDirectory: '<rootDir>/test/unit/coverage',
+  coverageThreshold: {
+    global: {
+      branches: 7,
+      functions: 9,
+      lines: 14,
+      statements: 14,
+    },
+  },
   collectCoverageFrom: [
     'src/**/*.{js,vue}',
+    'server/**/*.js',
     '!src/main.js',
     '!**/node_modules/**',
   ],

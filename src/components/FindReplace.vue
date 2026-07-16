@@ -282,7 +282,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../styles/variables.scss';
+@use '../styles/variables' as *;
 
 .find-replace {
   padding: 0 35px 0 25px;

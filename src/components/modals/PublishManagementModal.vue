@@ -80,7 +80,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../styles/variables.scss';
+@use '../../styles/variables' as *;
 
 .publish-entry {
   margin: 1.5em 0;

@@ -64,7 +64,8 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../styles/variables.scss';
+@use 'sass:color';
+@use '../../styles/variables' as *;
 
 .modal__inner-1.modal__inner-1--sponsor {
   max-width: 400px;
@@ -92,7 +93,7 @@ export default {
     font-size: 0.6rem;
     font-weight: 600;
     padding: 0.1em 0.2em;
-    background-color: darken($error-color, 10);
+    background-color: color.adjust($error-color, $lightness: -10%);
     border-radius: 3px;
     color: #fff;
     margin-left: -0.5em;

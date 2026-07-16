@@ -46,7 +46,7 @@ var webpackConfig = merge(baseWebpackConfig, {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendor',
-          chunks: 'all'
+          chunks: 'initial'
         }
       }
     },

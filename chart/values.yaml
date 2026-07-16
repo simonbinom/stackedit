@@ -13,6 +13,12 @@ wordpressSecret: ""
 paypalReceiverEmail: ""
 awsAccessKeyId: ""
 awsSecretAccessKey: ""
+existingSecret: ""
+
+exportMaxConcurrent: 2
+exportMaxInputBytes: 5242880
+exportRemoteHosts: "stackedit.io"
+exportTimeoutMs: 50000
 
 replicaCount: 1
 
@@ -24,6 +30,17 @@ image:
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  runAsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+  seccompProfile:
+    type: RuntimeDefault
 
 service:
   type: ClusterIP

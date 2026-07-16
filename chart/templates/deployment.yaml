@@ -24,6 +24,8 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           volumeMounts:
             - mountPath: /run
               name: run-volume
@@ -31,32 +33,56 @@ spec:
               name: tmp-volume
           env:
             - name: PORT
-              value: "80"
+              value: "8080"
+            - name: EXPORT_MAX_CONCURRENT
+              value: {{ .Values.exportMaxConcurrent | quote }}
+            - name: EXPORT_MAX_INPUT_BYTES
+              value: {{ .Values.exportMaxInputBytes | quote }}
+            - name: EXPORT_REMOTE_HOSTS
+              value: {{ .Values.exportRemoteHosts | quote }}
+            - name: EXPORT_TIMEOUT_MS
+              value: {{ .Values.exportTimeoutMs | quote }}
             - name: PAYPAL_RECEIVER_EMAIL
-              value: {{ .Values.paypalReceiverEmail }}
+              value: {{ .Values.paypalReceiverEmail | quote }}
             - name: AWS_ACCESS_KEY_ID
-              value: {{ .Values.awsAccessKeyId }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "stackedit.secretName" . }}
+                  key: awsAccessKeyId
+                  optional: true
             - name: AWS_SECRET_ACCESS_KEY
-              value: {{ .Values.awsSecretAccessKey }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "stackedit.secretName" . }}
+                  key: awsSecretAccessKey
+                  optional: true
             - name: DROPBOX_APP_KEY
-              value: {{ .Values.dropboxAppKey }}
+              value: {{ .Values.dropboxAppKey | quote }}
             - name: DROPBOX_APP_KEY_FULL
-              value: {{ .Values.dropboxAppKeyFull }}
+              value: {{ .Values.dropboxAppKeyFull | quote }}
             - name: GOOGLE_CLIENT_ID
-              value: {{ .Values.googleClientId }}
+              value: {{ .Values.googleClientId | quote }}
             - name: GOOGLE_API_KEY
-              value: {{ .Values.googleApiKey }}
+              value: {{ .Values.googleApiKey | quote }}
             - name: GITHUB_CLIENT_ID
-              value: {{ .Values.githubClientId }}
+              value: {{ .Values.githubClientId | quote }}
             - name: GITHUB_CLIENT_SECRET
-              value: {{ .Values.githubClientSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "stackedit.secretName" . }}
+                  key: githubClientSecret
+                  optional: true
             - name: WORDPRESS_CLIENT_ID
-              value: {{ .Values.wordpressClientId }}
+              value: {{ .Values.wordpressClientId | quote }}
             - name: WORDPRESS_SECRET
-              value: {{ .Values.wordpressSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "stackedit.secretName" . }}
+                  key: wordpressSecret
+                  optional: true
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8080
               protocol: TCP
           livenessProbe:
             httpGet:

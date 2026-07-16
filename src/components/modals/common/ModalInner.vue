@@ -22,7 +22,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../../styles/variables.scss';
+@use '../../../styles/variables' as *;
 
 .modal__close-button {
   position: absolute;

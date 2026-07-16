@@ -3,6 +3,7 @@ import networkSvc from '../../networkSvc';
 import store from '../../../store';
 import userSvc from '../../userSvc';
 import badgeSvc from '../../badgeSvc';
+import createPkce from '../../pkce';
 
 const getScopes = token => [token.repoFullAccess ? 'repo' : 'public_repo', 'gist'];
 
@@ -10,7 +11,7 @@ const request = (token, options) => networkSvc.request({
   ...options,
   headers: {
     ...options.headers || {},
-    Authorization: `token ${token.accessToken}`,
+    Authorization: `Bearer ${token.accessToken}`,
   },
   params: {
     ...options.params || {},
@@ -64,6 +65,7 @@ export default {
    */
   async startOauth2(scopes, sub = null, silent = false) {
     const clientId = store.getters['data/serverConf'].githubClientId;
+    const pkce = await createPkce();
 
     // Get an OAuth2 code
     const { code } = await networkSvc.startOauth2(
@@ -71,17 +73,19 @@ export default {
       {
         client_id: clientId,
         scope: scopes.join(' '),
+        code_challenge: pkce.challenge,
+        code_challenge_method: 'S256',
       },
       silent,
     );
 
     // Exchange code with token
     const accessToken = (await networkSvc.request({
-      method: 'GET',
+      method: 'POST',
       url: 'oauth2/githubToken',
-      params: {
-        clientId,
+      body: {
         code,
+        codeVerifier: pkce.verifier,
       },
     })).body;
 
@@ -90,7 +94,7 @@ export default {
       method: 'GET',
       url: 'https://api.github.com/user',
       headers: {
-        Authorization: `token ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     })).body;
     userSvc.addUserInfo({

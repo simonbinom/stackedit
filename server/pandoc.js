@@ -1,8 +1,9 @@
-const { spawn } = require('child_process');
-const fs = require('fs');
-const tmp = require('tmp');
 const user = require('./user');
 const conf = require('./conf');
+const exportDocumentPolicy = require('./exportDocumentPolicy');
+const exportErrors = require('./exportErrors');
+const exportInput = require('./exportInput');
+const exportProcess = require('./exportProcess');
 
 const outputFormats = {
   asciidoc: 'text/plain',
@@ -36,113 +37,59 @@ const readJson = (str) => {
   }
 };
 
-exports.generate = (req, res) => {
-  let pandocError = '';
+const buildParams = (outputFormat, options, metadata) => {
+  const params = [
+    '--sandbox',
+    '--pdf-engine=xelatex',
+  ];
+  if (options.toc) {
+    params.push('--toc');
+  }
+  const tocDepth = Number.parseInt(options.tocDepth, 10);
+  if (Number.isInteger(tocDepth)) {
+    params.push('--toc-depth', Math.min(6, Math.max(1, tocDepth)));
+  }
+  const highlightStyle = highlightStyles.includes(options.highlightStyle)
+    ? options.highlightStyle
+    : 'kate';
+  params.push('--highlight-style', highlightStyle);
+  Object.entries(metadata).forEach(([key, value]) => {
+    params.push('-M', `${key}=${value}`);
+  });
+
+  const format = outputFormat === 'pdf' ? 'latex' : outputFormat;
+  params.push('-f', 'json', '-t', format);
+  return params;
+};
+
+exports.generate = async (req, res) => {
   const outputFormat = Object.prototype.hasOwnProperty.call(outputFormats, req.query.format)
     ? req.query.format
     : 'pdf';
-  user.checkSponsor(req.query.idToken)
-    .then((isSponsor) => {
-      if (!isSponsor) {
-        throw new Error('unauthorized');
-      }
-
-      return new Promise((resolve, reject) => {
-        tmp.file({
-          postfix: `.${outputFormat}`,
-        }, (err, filePath, fd, cleanupCallback) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve({
-              filePath,
-              cleanupCallback,
-            });
-          }
-        });
-      });
-    })
-    .then(({ filePath, cleanupCallback }) => new Promise((resolve, reject) => {
-      const options = readJson(req.query.options);
-      const metadata = readJson(req.query.metadata);
-      const params = [];
-
-      params.push('--pdf-engine=xelatex');
-      params.push('--webtex=http://chart.apis.google.com/chart?cht=tx&chf=bg,s,FFFFFF00&chco=000000&chl=');
-      if (options.toc) {
-        params.push('--toc');
-      }
-      options.tocDepth = parseInt(options.tocDepth, 10);
-      if (!Number.isNaN(options.tocDepth)) {
-        params.push('--toc-depth', options.tocDepth);
-      }
-      options.highlightStyle = highlightStyles.includes(options.highlightStyle) ? options.highlightStyle : 'kate';
-      params.push('--highlight-style', options.highlightStyle);
-      Object.keys(metadata).forEach((key) => {
-        params.push('-M', `${key}=${metadata[key]}`);
-      });
-
-      let finished = false;
-
-      function onError(error) {
-        finished = true;
-        cleanupCallback();
-        reject(error);
-      }
-
-      const format = outputFormat === 'pdf' ? 'latex' : outputFormat;
-      params.push('-f', 'json', '-t', format, '-o', filePath);
-      const pandoc = spawn(conf.values.pandocPath, params, {
-        stdio: [
-          'pipe',
-          'ignore',
-          'pipe',
-        ],
-      });
-      let timeoutId = setTimeout(() => {
-        timeoutId = null;
-        pandoc.kill();
-      }, 50000);
-      pandoc.on('error', onError);
-      pandoc.stdin.on('error', onError);
-      pandoc.stderr.on('data', (data) => {
-        pandocError += `${data}`;
-      });
-      pandoc.on('close', (code) => {
-        if (!finished) {
-          clearTimeout(timeoutId);
-          if (!timeoutId) {
-            res.statusCode = 408;
-            cleanupCallback();
-            reject(new Error('timeout'));
-          } else if (code) {
-            cleanupCallback();
-            reject();
-          } else {
-            res.set('Content-Type', outputFormats[outputFormat]);
-            const readStream = fs.createReadStream(filePath);
-            readStream.on('open', () => readStream.pipe(res));
-            readStream.on('close', () => cleanupCallback());
-            readStream.on('error', () => {
-              cleanupCallback();
-              reject();
-            });
-          }
-        }
-      });
-      req.pipe(pandoc.stdin);
-    }))
-    .catch((err) => {
-      const message = err && err.message;
-      if (message === 'unauthorized') {
-        res.statusCode = 401;
-        res.end('Unauthorized.');
-      } else if (message === 'timeout') {
-        res.statusCode = 408;
-        res.end('Request timeout.');
-      } else {
-        res.statusCode = 400;
-        res.end(pandocError || 'Unknown error.');
-      }
+  try {
+    if (!await user.checkSponsor(user.getIdToken(req))) {
+      throw exportErrors.create('UNAUTHORIZED');
+    }
+    const input = await exportInput.read(req, req.exportMaxInputBytes);
+    const validatedInput = await exportDocumentPolicy.validatePandoc(input);
+    const metadata = exportDocumentPolicy.sanitizeMetadata(readJson(req.query.metadata));
+    const params = buildParams(outputFormat, readJson(req.query.options), metadata);
+    const { filePath, cleanupCallback } = await exportProcess.createTempFile({
+      postfix: `.${outputFormat}`,
     });
+    params.push('-o', filePath);
+    await exportProcess.run({
+      args: params,
+      cleanupCallback,
+      command: conf.values.pandocPath,
+      contentType: outputFormats[outputFormat],
+      filePath,
+      input: validatedInput,
+      res,
+    });
+  } catch (err) {
+    exportProcess.sendError(res, err, 'Pandoc');
+  }
 };
+
+exports.buildParams = buildParams;

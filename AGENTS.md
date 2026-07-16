@@ -120,3 +120,14 @@ For multi-step tasks, state a brief plan:
 ```
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+## GitHub PR workflow with 1Password
+
+The `origin` remote uses the `github.com-private` SSH host alias and its private GitHub key is provided by the 1Password SSH agent.
+
+1. Run `ssh -T github.com-private` in a real TTY before the first push and approve the 1Password/Touch ID prompt. GitHub's successful authentication message exits with status 1 because shell access is disabled; treat that message as success.
+2. Run `git push -u origin <branch>` in a TTY as well. Non-interactive SSH calls can find the public key but hang or fail when 1Password signs it.
+3. Create the PR with `gh pr create --repo simonbinom/stackedit --base master --head <branch> ...`.
+4. Verify the result with `gh pr view <number> --repo simonbinom/stackedit --json url,state,isDraft,title,headRefName,baseRefName`.
+
+Do not start by debugging or replacing credentials when the agent has no identities in a non-interactive check; try the TTY authentication flow first.
